@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "grpc-tools"
   spec.add_dependency "json"
   spec.add_dependency "openssl"
-  spec.add_dependency "json"
+
 
 
   # For more information and examples about making a new gem, checkout our
