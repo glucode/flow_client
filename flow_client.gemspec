@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A Ruby client for the Flow blockchain"
   spec.homepage      = "https://github.com/glucode/flow_client"
   spec.license       = "MIT"
-  spec.required_ruby_version = ">= 2.4.0"
+  spec.required_ruby_version = ">= 2.6.0"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to 'https://mygemserver.com'"
 
@@ -30,13 +30,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "rspec"
   spec.add_dependency "grpc"
   spec.add_dependency "grpc-tools"
   spec.add_dependency "json"
   spec.add_dependency "openssl"
-
-
+  spec.add_dependency "rspec"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html

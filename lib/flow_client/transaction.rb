@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module FlowClient
   class Transaction
-
     Payload = Struct.new(
       :script,
       :arguments,
@@ -17,6 +18,5 @@ module FlowClient
       :payload,
       :payload_signatures
     )
-
   end
 end
