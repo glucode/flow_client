@@ -23,6 +23,7 @@ module FlowClient
       res.account
     end
 
+    # Excute a script
     def execute_script(script, args = [])
       req = Access::ExecuteScriptAtLatestBlockRequest.new(
         script: script,
@@ -53,8 +54,13 @@ module FlowClient
       @stub.get_events_for_height_range(req)
     end
 
-    def hello
-      puts "Hello"
+    # Transactions
+
+    def send_transaction(transaction)
+      req = Access::SendTransactionRequest.new(
+        transaction: transaction
+      )
+      @stub.send_transaction(req)
     end
 
     private

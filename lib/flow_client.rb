@@ -6,5 +6,7 @@ require_relative "flow_client/version"
 module FlowClient
   class Error < StandardError; end
   # Your code goes here...
+  require "flow_client/crypto"
   require "flow_client/client"
+  require "flow_client/transaction"
 end
