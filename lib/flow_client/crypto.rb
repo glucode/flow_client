@@ -4,13 +4,11 @@ module FlowClient
   class Crypto
     def self.sign(data, key)
       digest = OpenSSL::Digest.digest('SHA3-256', data)
-      puts "(((((((((((((((((((("
-      puts data.unpack("H*")
       asn = key.dsa_sign_asn1(digest)
       asn1 = OpenSSL::ASN1.decode(asn)
       r, s = asn1.value
-      combined_bytes = Crypto.left_pad_bytes(r.value.to_s(16).unpack("C*"), 32) + Crypto.left_pad_bytes(s.value.to_s(16).unpack("C*"), 32)
-      puts "CRYPTO SIG: #{combined_bytes.pack("C*").inspect}"
+      combined_bytes = Crypto.left_pad_bytes([r.value.to_s(16)].pack("H*").unpack("C*"), 32) +
+        Crypto.left_pad_bytes([s.value.to_s(16)].pack("H*").unpack("C*"), 32)
       combined_bytes.pack("C*")
     end
 

@@ -4,7 +4,7 @@ require "flow/entities/transaction_pb"
 module FlowClient
   # A Transaction is a full transaction object containing a payload and signatures.
   class Transaction
-    DOMAIN_TAG = "FLOW-V0.0-transaction"
+    TRANSACTION_DOMAIN_TAG = "FLOW-V0.0-transaction"
 
     Payload = Struct.new(
       :script,
@@ -26,49 +26,57 @@ module FlowClient
     attr_reader :payload
 
     def initialize
+      client = FlowClient::Client.new("127.0.0.1:3569")
+      ref_block_id = client.get_latest_block.block.id.unpack1('H*')
+      # ref_block_id = "bf7efe182274e164303d923af96b40f2f2891ec855d44449a5d64859b9562f35"
+
+      puts "ADDRESS: #{Transaction.left_pad_bytes(["e03daebed8ca0615"].pack('H*').bytes, 8)}"
+
       @payload = Payload.new
       @envelope = Envelope.new
       @envelope_signatures = []
       @payload_signatures = []
+
+      @payload.script = %{
+        transaction { 
+          prepare(signer: AuthAccount) { log(signer.address) }
+        }
+      }
+
+      @payload.arguments = []
+      @payload.gas_limit = 100
+      @payload.proposer_address = Transaction.left_pad_bytes(["045a1763c93006ca"].pack('H*').bytes, 8).pack("C*")
+      @payload.proposer_key_index = 0
+      @payload.proposer_key_sequence_number = 3
+      @payload.payer_address = @payload.proposer_address
+      @payload.authorizer_addresses = [@payload.proposer_address]
+      @payload.reference_block_id = ref_block_id
     end
 
-    def self.padded_domain_tag
-      bytes = Transaction.left_pad_bytes(DOMAIN_TAG.bytes, 32)
+    def self.padded_TRANSACTION_DOMAIN_TAG
+      bytes = Transaction.left_pad_bytes(TRANSACTION_DOMAIN_TAG.bytes, 32)
       bytes.pack("c*")
     end
 
     def payload_canonical_form
-      script = "\n            transaction { \n                prepare(signer: AuthAccount) { log(signer.address) }\n            }\n        "
-
-      gas_limit = 100
-
-      arguments = []
-      # puts arguments = {}.to_json.bytes
-
-      # puts script.bytes
-      ref_block_id = "fcda9a61596251b2bfe20b0d510921b0dac99f0794f1645ad0a0fff5750a9804"
-      # puts Transaction.left_pad_bytes(ref_block_id.bytes, 32)
-
-      address = ["01cf0e2f2f715450"].pack("H*")
-
-      payload = [
-        script,
-        arguments,
-        [ref_block_id].pack("H*"),
-        gas_limit,
-        address,
-        0,
-        0,
-        address,
-        [address]
+      [
+        @payload.script,
+        @payload.arguments,
+        [@payload.reference_block_id].pack('H*'),
+        @payload.gas_limit,
+        @payload.proposer_address,
+        @payload.proposer_key_index,
+        @payload.proposer_key_sequence_number,
+        @payload.payer_address,
+        @payload.authorizer_addresses
       ]
     end
 
     def payload_message
       payload = payload_canonical_form
 
-      # example = %w[248 186 184 119 10 32 32 32 32 32 32 32 32 32 32 32 32 116 114 97 110 115 97 99 116 105 111 110 32 123 32 10 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 112 114 101 112 97 114 101 40 115 105 103 110 101 114 58 32 65 117 116 104 65 99 99 111 117 110 116 41 32 123 32 108 111 103 40 115 105 103 110 101 114 46 97 100 100 114 101 115 115 41 32 125 10 32 32 32 32 32 32 32 32 32 32 32 32 125 10 32 32 32 32 32 32 32 32 192 160 63 121 162 22 110 78 24 218 96 97 59 50 199 220 202 201 20 229 187 187 202 30 165 210 217 22 116 81 129 102 221 254 100 136 235 23 156 39 20 79 120 60 128 128 136 235 23 156 39 20 79 120 60 201 136 235 23 156 39 20 79 120 60].map(&:to_i).pack("c*")
-      # decoded_example = RLP.decode(example)
+      example = %w[248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 72 121 153 246 93 184 142 181 159 21 71 108 105 182 234 79 105 166 51 159 166 79 128 92 248 80 65 251 159 240 90 36 100 136 243 252 210 193 167 143 94 238 128 128 136 243 252 210 193 167 143 94 238 201 136 243 252 210 193 167 143 94 238].map(&:to_i).pack("c*")
+      decoded_example = RLP.decode(example)
       # puts "----------"
       # puts decoded_example.inspect
       # puts "----------"
@@ -86,6 +94,11 @@ module FlowClient
     end
 
     def envelope_canonical_form
+      # puts "1 !!!!!!!!!!!!!!!!!!!!!!!!!"
+      # puts payload_canonical_form.inspect
+      # puts "2 !!!!!!!!!!!!!!!!!!!!!!!!!"
+      # puts %w[248 117 248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 72 121 153 246 93 184 142 181 159 21 71 108 105 182 234 79 105 166 51 159 166 79 128 92 248 80 65 251 159 240 90 36 100 136 243 252 210 193 167 143 94 238 128 128 136 243 252 210 193 167 143 94 238 201 136 243 252 210 193 167 143 94 238 192].map(&:to_i).pack("c*").inspect
+      # puts "3 !!!!!!!!!!!!!!!!!!!!!!!!!"
       [
         payload_canonical_form,
         []
@@ -93,85 +106,72 @@ module FlowClient
     end
 
     def envelope_message
-      # example = %w[248 189 248 186 184 119 10 32 32 32 32 32 32 32 32 32 32 32 32 116 114 97 110 115 97 99 116 105 111 110 32 123 32 10 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 112 114 101 112 97 114 101 40 115 105 103 110 101 114 58 32 65 117 116 104 65 99 99 111 117 110 116 41 32 123 32 108 111 103 40 115 105 103 110 101 114 46 97 100 100 114 101 115 115 41 32 125 10 32 32 32 32 32 32 32 32 32 32 32 32 125 10 32 32 32 32 32 32 32 32 192 160 252 218 154 97 89 98 81 178 191 226 11 13 81 9 33 176 218 201 159 7 148 241 100 90 208 160 255 245 117 10 152 4 100 136 1 207 14 47 47 113 84 80 128 128 136 1 207 14 47 47 113 84 80 201 136 1 207 14 47 47 113 84 80 192].map(&:to_i).pack("c*")
-      # decoded_example = RLP.decode(example)
-      # puts "----------"
-      # puts decoded_example.inspect
-      # puts RLP.decode(RLP.encode(envelope_canonical_form)).inspect
-      # puts "----------"
-       
-      # puts "**********"
-      # puts "ENVELOPE MESSAGE"
-      # puts "----------------"
-      # puts RLP.encode(envelope_canonical_form).bytes.inspect
-      # puts "**********"
+      example = %w[248 117 248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 191 126 254 24 34 116 225 100 48 61 146 58 249 107 64 242 242 137 30 200 85 212 68 73 165 214 72 89 185 86 47 53 100 136 4 90 23 99 201 48 6 202 128 128 136 4 90 23 99 201 48 6 202 201 136 4 90 23 99 201 48 6 202 192].map(&:to_i).pack("c*")
+      decoded_example = RLP.decode(example)
+      puts "----------"
+      puts decoded_example.inspect
+      puts RLP.decode(RLP.encode(envelope_canonical_form)).inspect
+      puts "----------"
+
+      puts "**********"
+      puts "RLP ENCODED ENVELOPE MESSAGE"
+      puts "----------------"
+      puts RLP.encode(envelope_canonical_form).bytes.inspect
+      puts "**********"
       RLP.encode(envelope_canonical_form)
-      # Transaction.padded_domain_tag << RLP.encode(envelope_canonical_form)
     end
 
     def signed_payload(address, key_index, signer)
-      # tagged_message = envelope_message.bytes << Transaction.padded_domain_tag
+      # tagged_message = envelope_message.bytes << Transaction.padded_TRANSACTION_DOMAIN_TAG
       # puts "**********"
 
       # puts "**********"
       # message = envelope_message
-
     end
 
-    def signed_envelope()
-      tagged_message = Transaction.padded_domain_tag.bytes + envelope_message.bytes
+    def envelope_signature
+      tagged_message = Transaction.padded_TRANSACTION_DOMAIN_TAG.bytes + envelope_message.bytes
       tagged_message = tagged_message.pack('C*')
-      # puts "**********"
-      # puts "TAGGED ENVELOPE MESSAGE"
-      # puts "----------------"
-      # puts tagged_message.bytes.inspect
-      # puts "**********"
+      puts "**********"
+      puts "TAGGED ENVELOPE MESSAGE"
+      puts "----------------"
+      puts tagged_message.inspect
+      puts %w[70 76 79 87 45 86 48 46 48 45 116 114 97 110 115 97 99 116 105 111 110 0 0 0 0 0 0 0 0 0 0 0 248 117 248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 191 126 254 24 34 116 225 100 48 61 146 58 249 107 64 242 242 137 30 200 85 212 68 73 165 214 72 89 185 86 47 53 100 136 4 90 23 99 201 48 6 202 128 128 136 4 90 23 99 201 48 6 202 201 136 4 90 23 99 201 48 6 202 192].map(&:to_i).pack("c*").inspect
+      puts "<<<<<<<<<<< **********"
 
       key = FlowClient::Crypto.key_from_hex_keys(
-        '96ccb4d1856d18d5aed93abf558e2235e1226fa1fc5010a1bc48278b70115317',
-        '040be797c6f1eb6ac8eda984493c4a159d6b016e9a6e6808280b1c5f08ab319687d4eb0750d61fdeed919a76719d43a2edc230abad05ec9f6413c63f5c2b6690e5'
+        '86d466c36c02c9897844057a7435d0ae42b77294433e70ddd8c80e6b162a2489',
+        '04c35e9e97bfe10a01b3803631e94c05761515b389f25c43786f7c5886e7d1545dcb1588719aa295b42d459c51e6e25ef25756abd06895d972d3cf78d62608dbd2'
       )
 
       FlowClient::Crypto.sign(tagged_message, key)
     end
 
     def to_message
-      script = %{
-        transaction {
-          prepare(signer: AuthAccount) { log(signer.address) }
-        }
-      }
-
-      address = ["01cf0e2f2f715450"].pack('H*')
-      reference_block_id = [@payload.reference_block_id].pack('H*')
-
-      puts "<<<<< &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n\n"
-      puts signed_envelope.inspect
-      # puts signed_envelope.inspect
-      puts "<<<<< &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n\n"
-
-      envelope_signature = Entities::Transaction::Signature.new(
-        address: address,
-        key_id: 0,
-        signature: [signed_envelope].pack("H*")
+      puts envelope_signature.inspect
+      puts %w[201 159 186 250 20 195 169 176 16 128 200 154 50 249 239 220 221 149 255 210 230 181 237 96 56 158 51 241 110 139 34 201 93 88 248 235 55 206 229 231 39 47 106 31 54 122 59 252 171 165 245 9 112 33 175 6 70 180 157 77 148 130 69 225].map(&:to_i).pack("c*").inspect
+      sig = Entities::Transaction::Signature.new(
+        address: @payload.payer_address,
+        key_id: @payload.proposer_key_index,
+        signature: envelope_signature
       )
 
       proposal_key = Entities::Transaction::ProposalKey.new(
-        address: address,
-        key_id: 0,
-        sequence_number: 0
+        address: @payload.proposer_address,
+        key_id: @payload.proposer_key_index,
+        sequence_number: @payload.proposer_key_sequence_number
       )
 
       Entities::Transaction.new(
-        script: script,
-        arguments: [],
-        reference_block_id: reference_block_id,
-        gas_limit: 100,
+        script: @payload.script,
+        arguments: @payload.arguments,
+        reference_block_id: [@payload.reference_block_id].pack('H*'),
+        gas_limit: @payload.gas_limit,
         proposal_key: proposal_key,
-        payer: address,
-        authorizers: [address],
+        payer: @payload.payer_address,
+        authorizers: @payload.authorizer_addresses,
         payload_signatures: [],
-        envelope_signatures: [envelope_signature]
+        envelope_signatures: [sig]
       )
     end
 

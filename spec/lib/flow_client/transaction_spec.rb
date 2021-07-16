@@ -8,7 +8,7 @@ RSpec.describe FlowClient::Transaction do
   end
 
   it "has a valid domain tag const" do
-    expect(FlowClient::Transaction.padded_domain_tag.unpack1("H*")).to eq(
+    expect(FlowClient::Transaction.padded_TRANSACTION_DOMAIN_TAG.unpack1("H*")).to eq(
       "464c4f572d56302e302d7472616e73616374696f6e0000000000000000000000"
     )
   end
@@ -20,7 +20,7 @@ RSpec.describe FlowClient::Transaction do
   end
 
   it "envelope" do
-    puts FlowClient::Transaction.new.envelope_message.inspect
+    # puts FlowClient::Transaction.new.envelope_message.inspect
   end
 
   it "converts the transaction to a pb message" do
@@ -28,7 +28,7 @@ RSpec.describe FlowClient::Transaction do
     ref_block_id = client.get_latest_block.block.id.unpack1('H*')
 
     transaction = FlowClient::Transaction.new
-    transaction.payload.reference_block_id = ref_block_id
+    # transaction.payload.reference_block_id = ref_block_id
     message = transaction.to_message
 
     puts client.send_transaction(message).inspect
