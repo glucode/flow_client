@@ -6,20 +6,6 @@ module FlowClient
   class Transaction
     TRANSACTION_DOMAIN_TAG = "FLOW-V0.0-transaction"
 
-    # Payload = Struct.new(
-    #   :script,
-    #   :arguments,
-    #   :reference_block_id,
-    #   :gas_limit,
-    #   :proposer_address,
-    #   :proposer_key_index,
-    #   :proposer_key_sequence_number,
-    #   :payer_address,
-    #   :authorizer_addresses
-    # )
-
-    # attr_reader :payload
-
     attr_accessor :script,
                   :arguments,
                   :reference_block_id,
@@ -35,6 +21,7 @@ module FlowClient
       @arguments = []
       @script = ""
       @gas_limit = 0
+      @envelope_signatures = []
     end
 
     def self.padded_transaction_domain_tag
@@ -107,7 +94,6 @@ module FlowClient
       # puts RLP.encode(envelope_canonical_form).bytes.inspect
       # puts "**********"
       envelope = envelope_canonical_form
-      puts envelope.inspect
       RLP.encode(envelope_canonical_form)
     end
 
@@ -119,33 +105,20 @@ module FlowClient
       # message = envelope_message
     end
 
-    def envelope_signature
-      tagged_message = Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes
-      tagged_message = tagged_message.pack('C*')
-      # puts "**********"
-      # puts "TAGGED ENVELOPE MESSAGE"
-      # puts "----------------"
-      # puts tagged_message.inspect
-      # puts %w[70 76 79 87 45 86 48 46 48 45 116 114 97 110 115 97 99 116 105 111 110 0 0 0 0 0 0 0 0 0 0 0 248 117 248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 191 126 254 24 34 116 225 100 48 61 146 58 249 107 64 242 242 137 30 200 85 212 68 73 165 214 72 89 185 86 47 53 100 136 4 90 23 99 201 48 6 202 128 128 136 4 90 23 99 201 48 6 202 201 136 4 90 23 99 201 48 6 202 192].map(&:to_i).pack("c*").inspect
-      # puts "<<<<<<<<<<< **********"
+    def add_envelope_signature(signer_address, key_index, key)
+      domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack('C*')
 
-      key = FlowClient::Crypto.key_from_hex_keys(
-        '81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b',
-        '041c3e4980f2e7d733a7b023b6f9b9f5c0ff8116869492fd3b813597f9d17f826130c2e68fee90fc8beeabcb05c2bffa4997166ba5ab86942b03c8c86ab13e50d8'
+      @envelope_signatures << Entities::Transaction::Signature.new(
+        address: prepared_address(signer_address),
+        key_id: key_index,
+        signature: FlowClient::Crypto.sign(domain_tagged_payload, key)
       )
-
-      FlowClient::Crypto.sign(tagged_message, key)
     end
 
     def to_message
       payload = payload_canonical_form
       # puts envelope_signature.inspect
       # puts %w[201 159 186 250 20 195 169 176 16 128 200 154 50 249 239 220 221 149 255 210 230 181 237 96 56 158 51 241 110 139 34 201 93 88 248 235 55 206 229 231 39 47 106 31 54 122 59 252 171 165 245 9 112 33 175 6 70 180 157 77 148 130 69 225].map(&:to_i).pack("c*").inspect
-      sig = Entities::Transaction::Signature.new(
-        address: payload[7],
-        key_id: payload[5],
-        signature: envelope_signature
-      )
 
       proposal_key = Entities::Transaction::ProposalKey.new(
         address: payload[4],
@@ -162,7 +135,7 @@ module FlowClient
         payer: payload[7],
         authorizers: payload[8],
         payload_signatures: [],
-        envelope_signatures: [sig]
+        envelope_signatures: @envelope_signatures
       )
     end
   end

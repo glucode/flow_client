@@ -51,23 +51,29 @@ RSpec.describe FlowClient::Transaction do
   end
 
   it "converts the transaction to a pb message" do
-    client = FlowClient::Client.new("127.0.0.1:3569")
+    client = FlowClient::Client.new("access.devnet.nodes.onflow.org:9000")
     ref_block_id = client.get_latest_block.block.id.unpack1('H*')
+
+    key = FlowClient::Crypto.key_from_hex_keys(
+      '703efdc5c8594759b35ba110c352e2e55cf780eb41d94484125ec71553474a20',
+      '045f729cef1fe88ab59063b9f3eca7c9ec4a4b37cb6cb914b94b9fc49d71e299e08986949c92994de5fba0887753a17d19cc257fc31a69f20568b5bfb211147d8a'
+    )
 
     transaction = FlowClient::Transaction.new
     transaction.script = %{
-      transaction { 
-        prepare(signer: AuthAccount) { log(signer.address) }
+      transaction {
+          prepare(acct: AuthAccount){}
+          execute { log("Hello") }
       }
     }
     transaction.reference_block_id = ref_block_id
-    transaction.proposer_address = "f8d6e0586b0a20c7"
+    transaction.proposer_address = "76ecd94a2bb02327"
     transaction.proposer_key_index = 0
-    transaction.proposer_key_sequence_number = 0
-    transaction.payer_address = "f8d6e0586b0a20c7"
-    transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
+    transaction.arguments = []
+    transaction.proposer_key_sequence_number = 45
+    transaction.payer_address = "76ecd94a2bb02327"
+    transaction.authorizer_addresses = ["76ecd94a2bb02327"]
+    transaction.add_envelope_signature("76ecd94a2bb02327", 0, key)
     message = transaction.to_message
-
-    puts client.send_transaction(message).inspect
   end
 end
