@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "flow_client/version"
+require "openssl"
+require "rlp"
 
 # Collection of classes to interact with the Flow blockchain
 module FlowClient
