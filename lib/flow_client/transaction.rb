@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 require "flow/entities/transaction_pb"
+require "openssl"
+require "rlp"
 
 module FlowClient
   # A Transaction is a full transaction object containing a payload and signatures.
