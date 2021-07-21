@@ -71,7 +71,7 @@ module FlowClient
     end
 
     def get_transaction_result(transaction_id)
-      req = Access::GetTransactionResult.new(
+      req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
       )
       @stub.get_transaction_result(req)
