@@ -63,6 +63,13 @@ module FlowClient
       @stub.send_transaction(req)
     end
 
+    def get_transaction(transaction_id)
+      req = Access::GetTransactionRequest.new(
+        id: to_bytes(transaction_id)
+      )
+      @stub.get_transaction(req)
+    end
+
     private
 
     def parse_json(event_payload)
