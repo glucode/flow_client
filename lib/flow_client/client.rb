@@ -17,13 +17,14 @@ module FlowClient
       @stub.ping(req)
     end
 
+    # Accounts
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
       res = @stub.get_account_at_latest_block(req)
       res.account
     end
 
-    # Excute a script
+    # Scripts
     def execute_script(script, args = [])
       req = Access::ExecuteScriptAtLatestBlockRequest.new(
         script: script,
@@ -34,7 +35,6 @@ module FlowClient
     end
 
     # Blocks
-
     def get_latest_block(is_sealed: true)
       req = Access::GetLatestBlockRequest.new(
         is_sealed: is_sealed
@@ -44,7 +44,6 @@ module FlowClient
     end
 
     # Events
-
     def get_events(type, start_height, end_height)
       req = Access::GetEventsForHeightRangeRequest.new(
         type: type,
@@ -55,7 +54,6 @@ module FlowClient
     end
 
     # Transactions
-
     def send_transaction(transaction)
       req = Access::SendTransactionRequest.new(
         transaction: transaction

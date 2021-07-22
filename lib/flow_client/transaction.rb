@@ -18,7 +18,8 @@ module FlowClient
                   :proposer_key_sequence_number,
                   :payer_address,
                   :authorizer_addresses
-    attr_reader :envelope_signatures
+
+    attr_reader :envelope_signatures, :payload_signatures
 
     def initialize
       @authorizer_addresses = []
@@ -26,6 +27,7 @@ module FlowClient
       @script = ""
       @gas_limit = 0
       @envelope_signatures = []
+      @payload_signatures = []
       @proposer_key_index = 0
       @proposer_key_sequence_number = 0
     end

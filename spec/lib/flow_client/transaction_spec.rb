@@ -3,6 +3,15 @@
 require "rlp"
 
 RSpec.describe FlowClient::Transaction do
+  let(:reference_block_id) { "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7" }
+
+  let(:key) do
+    FlowClient::Crypto.key_from_hex_keys(
+      "81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b",
+      "041c3e4980f2e7d733a7b023b6f9b9f5c0ff8116869492fd3b813597f9d17f826130c2e68fee90fc8beeabcb05c2bffa4997166ba5ab86942b03c8c86ab13e50d8"
+    )
+  end
+
   it "has a valid domain tag const" do
     expect(FlowClient::Transaction.padded_transaction_domain_tag.unpack1("H*")).to eq(
       "464c4f572d56302e302d7472616e73616374696f6e0000000000000000000000"
@@ -38,61 +47,105 @@ RSpec.describe FlowClient::Transaction do
     end
 
     it "sets the ref block id" do
-      block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
-      @transaction.reference_block_id = block_id
-      expect(@transaction.reference_block_id).to eq(block_id)
+      @transaction.reference_block_id = reference_block_id
+      expect(@transaction.reference_block_id).to eq(reference_block_id)
     end
   end
 
-  context "the generated payload" do
-    it "correctly packages the script" do
-      ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
-
-      # transaction = FlowClient::Transaction.new
-      # transaction.script = %{
-      #   transaction {
-      #     prepare(signer: AuthAccount) { log(signer.address) }
-      #   }
-      # }
-      # transaction.reference_block_id = ref_block_id
-      # transaction.proposer_address = "f8d6e0586b0a20c7"
-      # transaction.proposer_key_index = 0
-      # transaction.proposer_key_sequence_number = 0
-      # transaction.payer_address = "f8d6e0586b0a20c7"
-      # transaction.authorizer_addresses = []
-      # message = transaction.to_message
-
-      # decoded_payload = RLP.decode(FlowClient::Transaction.new.payload_message)
-    end
-  end
-
-  it "envelope" do
-  end
-
-  it "converts the transaction to a pb message" do
-    ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
-
-    key = FlowClient::Crypto.key_from_hex_keys(
-      "81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b",
-      "041c3e4980f2e7d733a7b023b6f9b9f5c0ff8116869492fd3b813597f9d17f826130c2e68fee90fc8beeabcb05c2bffa4997166ba5ab86942b03c8c86ab13e50d8"
-    )
-
-    transaction = FlowClient::Transaction.new
-    transaction.script = %{
-      transaction(message: String) {
-          prepare(acct: AuthAccount) {}
-          execute { log(message) }
+  describe "envelope signatures" do
+    let(:script) do
+      %{
+        transaction(message: String) {
+            prepare(acct: AuthAccount) {}
+            execute { log(message) }
+        }
       }
-    }
-    transaction.reference_block_id = ref_block_id
-    transaction.proposer_address = "f8d6e0586b0a20c7"
-    transaction.proposer_key_index = 0
-    transaction.arguments = [{ type: "String", value: "Hello world!" }.to_json]
-    transaction.proposer_key_sequence_number = 0
-    transaction.payer_address = "f8d6e0586b0a20c7"
-    transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
-    transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, key)
-    message = transaction.to_protobuf_message
-    puts message
+    end
+
+    let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
+
+    let(:gas_limit) { 100 }
+
+    let(:original_address) { "f8d6e0586b0a20c7" }
+
+    let(:padded_address) do
+      FlowClient::Utils.left_pad_bytes(["f8d6e0586b0a20c7"].pack("H*").bytes, 8).pack("C*")
+    end
+
+    let(:transaction) do
+      @transaction = FlowClient::Transaction.new
+      @transaction.script = script
+      @transaction.reference_block_id = reference_block_id
+      @transaction.gas_limit = gas_limit
+      @transaction.proposer_address = original_address
+      @transaction.proposer_key_index = 1
+      @transaction.arguments = arguments
+      @transaction.proposer_key_sequence_number = 10
+      @transaction.payer_address = original_address
+      @transaction.authorizer_addresses = [original_address]
+      @transaction.add_envelope_signature(original_address, 0, key)
+      @transaction.to_protobuf_message
+      @transaction
+    end
+
+    context "single proposer, payer and signer" do
+      it "has no payload signatures" do
+        expect(transaction.payload_signatures).to eq([])
+      end
+
+      it "has a valid signature" do
+        # @transaction.
+      end
+    end
+  end
+
+  describe "to_protobuf_message" do
+    let(:script) do
+      %{
+        transaction(message: String) {
+            prepare(acct: AuthAccount) {}
+            execute { log(message) }
+        }
+      }
+    end
+
+    let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
+    let(:gas_limit) { 100 }
+    let(:original_address) { "f8d6e0586b0a20c7" }
+
+    let(:padded_address) do
+      FlowClient::Utils.left_pad_bytes(["f8d6e0586b0a20c7"].pack("H*").bytes, 8).pack("C*")
+    end
+
+    let(:protobuf_message) do
+      @transaction = FlowClient::Transaction.new
+      @transaction.script = script
+      @transaction.reference_block_id = reference_block_id
+      @transaction.gas_limit = gas_limit
+      @transaction.proposer_address = original_address
+      @transaction.proposer_key_index = 1
+      @transaction.arguments = arguments
+      @transaction.proposer_key_sequence_number = 10
+      @transaction.payer_address = original_address
+      @transaction.authorizer_addresses = [original_address]
+      @transaction.add_envelope_signature(original_address, 0, key)
+      @transaction.to_protobuf_message
+    end
+
+    it { expect(protobuf_message).to be_a(Entities::Transaction) }
+    it { expect(protobuf_message.script).to eq(script) }
+    it { expect(protobuf_message.arguments).to eq(arguments) }
+    it { expect(protobuf_message.reference_block_id).to eq([reference_block_id].pack("H*")) }
+    it { expect(protobuf_message.gas_limit).to eq(gas_limit) }
+
+    it { expect(protobuf_message.proposal_key).to be_a(Entities::Transaction::ProposalKey) }
+    it { expect(protobuf_message.proposal_key.address).to eq(padded_address) }
+    it { expect(protobuf_message.proposal_key.key_id).to eq(1) }
+    it { expect(protobuf_message.proposal_key.sequence_number).to eq(10) }
+
+    it { expect(protobuf_message.payer).to eq(padded_address) }
+    it { expect(protobuf_message.authorizers).to eq([padded_address]) }
+    it { expect(protobuf_message.payload_signatures).to eq([]) }
+    it { expect(protobuf_message.envelope_signatures).to eq(@transaction.envelope_signatures) } 
   end
 end
