@@ -9,6 +9,23 @@ RSpec.describe FlowClient::Transaction do
     )
   end
 
+  context "init" do
+    before(:example) do
+      @transaction = FlowClient::Transaction.new
+    end
+
+    it { expect(@transaction.script).to eq("") }
+    it { expect(@transaction.arguments).to eq([]) }
+    it { expect(@transaction.reference_block_id).to eq(nil) }
+    it { expect(@transaction.gas_limit).to eq(0) }
+    it { expect(@transaction.proposer_address).to eq(nil) }
+    it { expect(@transaction.proposer_key_index).to eq(0) }
+    it { expect(@transaction.proposer_key_sequence_number).to eq(0) }
+    it { expect(@transaction.payer_address).to eq(nil) }
+    it { expect(@transaction.authorizer_addresses).to eq([]) }
+    it { expect(@transaction.envelope_signatures).to eq([]) }
+  end
+
   context "with accessors" do
     before(:example) do
       @transaction = FlowClient::Transaction.new
@@ -21,7 +38,7 @@ RSpec.describe FlowClient::Transaction do
     end
 
     it "sets the ref block id" do
-      block_id = "123"
+      block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
       @transaction.reference_block_id = block_id
       expect(@transaction.reference_block_id).to eq(block_id)
     end
@@ -29,6 +46,8 @@ RSpec.describe FlowClient::Transaction do
 
   context 'the generated payload' do
     it "correctly packages the script" do
+      ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
+
       # transaction = FlowClient::Transaction.new
       # transaction.script = %{
       #   transaction { 
@@ -51,8 +70,7 @@ RSpec.describe FlowClient::Transaction do
   end
 
   it "converts the transaction to a pb message" do
-    client = FlowClient::Client.new("127.0.0.1:3569")
-    ref_block_id = client.get_latest_block.block.id.unpack1('H*')
+    ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
 
     key = FlowClient::Crypto.key_from_hex_keys(
       '81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b',
@@ -70,11 +88,11 @@ RSpec.describe FlowClient::Transaction do
     transaction.proposer_address = "f8d6e0586b0a20c7"
     transaction.proposer_key_index = 0
     transaction.arguments = [ { type: "String", value: "Hello world!" }.to_json ]
-    transaction.proposer_key_sequence_number = 3
+    transaction.proposer_key_sequence_number = 0
     transaction.payer_address = "f8d6e0586b0a20c7"
     transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
     transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, key)
-    message = transaction.to_message
-    # puts client.send_transaction(message)
+    message = transaction.to_protobuf_message
+    puts message
   end
 end

@@ -17,6 +17,7 @@ module FlowClient
                   :proposer_key_sequence_number,
                   :payer_address,
                   :authorizer_addresses
+    attr_reader :envelope_signatures
 
     def initialize
       @authorizer_addresses = []
@@ -24,14 +25,12 @@ module FlowClient
       @script = ""
       @gas_limit = 0
       @envelope_signatures = []
+      @proposer_key_index = 0
+      @proposer_key_sequence_number = 0
     end
 
     def self.padded_transaction_domain_tag
       Utils.right_pad_bytes(TRANSACTION_DOMAIN_TAG.bytes, 32).pack("c*")
-    end
-
-    def prepared_address(address_hex_string)
-      Utils.left_pad_bytes([address_hex_string].pack('H*').bytes, 8).pack("C*")
     end
 
     def payload_canonical_form
@@ -40,11 +39,11 @@ module FlowClient
         @arguments,
         [@reference_block_id].pack('H*'),
         @gas_limit,
-        prepared_address(@proposer_address),
+        padded_address(@proposer_address),
         @proposer_key_index,
         @proposer_key_sequence_number,
-        prepared_address(@payer_address),
-        @authorizer_addresses.map { |address| prepared_address(address) }
+        padded_address(@payer_address),
+        @authorizer_addresses.map { |address| padded_address(address) }
       ]
     end
 
@@ -99,25 +98,17 @@ module FlowClient
       RLP.encode(envelope_canonical_form)
     end
 
-    def signed_payload(address, key_index, signer)
-      # tagged_message = envelope_message.bytes << Transaction.padded_transaction_domain_tag
-      # puts "**********"
-
-      # puts "**********"
-      # message = envelope_message
-    end
-
     def add_envelope_signature(signer_address, key_index, key)
       domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack('C*')
 
       @envelope_signatures << Entities::Transaction::Signature.new(
-        address: prepared_address(signer_address),
+        address: padded_address(signer_address),
         key_id: key_index,
         signature: FlowClient::Crypto.sign(domain_tagged_payload, key)
       )
     end
 
-    def to_message
+    def to_protobuf_message
       payload = payload_canonical_form
       # puts envelope_signature.inspect
       # puts %w[201 159 186 250 20 195 169 176 16 128 200 154 50 249 239 220 221 149 255 210 230 181 237 96 56 158 51 241 110 139 34 201 93 88 248 235 55 206 229 231 39 47 106 31 54 122 59 252 171 165 245 9 112 33 175 6 70 180 157 77 148 130 69 225].map(&:to_i).pack("c*").inspect
@@ -139,6 +130,12 @@ module FlowClient
         payload_signatures: [],
         envelope_signatures: @envelope_signatures
       )
+    end
+
+    protected
+
+    def padded_address(address_hex_string)
+      Utils.left_pad_bytes([address_hex_string].pack('H*').bytes, 8).pack("C*")
     end
   end
 end
