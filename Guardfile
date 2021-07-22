@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
@@ -15,7 +17,7 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-# Note: The cmd option is now required due to the increasing number of ways
+# NOTE: The cmd option is now required due to the increasing number of ways
 #       rspec may be run, below are examples of the most common uses.
 #  * bundler: 'bundle exec rspec'
 #  * bundler binstubs: 'bin/rspec'
@@ -24,11 +26,11 @@
 #  * zeus: 'zeus rspec' (requires the server to be started separately)
 #  * 'just' rspec: 'rspec'
 
-guard :rspec, cmd: 'rspec' do
+guard :rspec, cmd: "rspec" do
   watch(%r{^spec/.+_spec\.rb$})
-  watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
-  watch(%r{^lib/flow_clients(.+)\.rb$})     { |m| "spec/lib/flow_client/#{m[1]}_spec.rb" }
-  watch('spec/spec_helper.rb')  { "spec" }
+  watch(%r{^lib/(.+)\.rb$}) { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^lib/flow_clients(.+)\.rb$}) { |m| "spec/lib/flow_client/#{m[1]}_spec.rb" }
+  watch("spec/spec_helper.rb") { "spec" }
 end
 
 # guard :rspec, cmd: "bundle exec rspec" do

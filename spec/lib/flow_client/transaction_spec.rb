@@ -44,13 +44,13 @@ RSpec.describe FlowClient::Transaction do
     end
   end
 
-  context 'the generated payload' do
+  context "the generated payload" do
     it "correctly packages the script" do
       ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
 
       # transaction = FlowClient::Transaction.new
       # transaction.script = %{
-      #   transaction { 
+      #   transaction {
       #     prepare(signer: AuthAccount) { log(signer.address) }
       #   }
       # }
@@ -73,8 +73,8 @@ RSpec.describe FlowClient::Transaction do
     ref_block_id = "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7"
 
     key = FlowClient::Crypto.key_from_hex_keys(
-      '81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b',
-      '041c3e4980f2e7d733a7b023b6f9b9f5c0ff8116869492fd3b813597f9d17f826130c2e68fee90fc8beeabcb05c2bffa4997166ba5ab86942b03c8c86ab13e50d8'
+      "81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b",
+      "041c3e4980f2e7d733a7b023b6f9b9f5c0ff8116869492fd3b813597f9d17f826130c2e68fee90fc8beeabcb05c2bffa4997166ba5ab86942b03c8c86ab13e50d8"
     )
 
     transaction = FlowClient::Transaction.new
@@ -87,7 +87,7 @@ RSpec.describe FlowClient::Transaction do
     transaction.reference_block_id = ref_block_id
     transaction.proposer_address = "f8d6e0586b0a20c7"
     transaction.proposer_key_index = 0
-    transaction.arguments = [ { type: "String", value: "Hello world!" }.to_json ]
+    transaction.arguments = [{ type: "String", value: "Hello world!" }.to_json]
     transaction.proposer_key_sequence_number = 0
     transaction.payer_address = "f8d6e0586b0a20c7"
     transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]

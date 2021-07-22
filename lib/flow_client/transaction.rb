@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "flow/entities/transaction_pb"
 require "openssl"
 require "rlp"
@@ -37,7 +38,7 @@ module FlowClient
       [
         @script,
         @arguments,
-        [@reference_block_id].pack('H*'),
+        [@reference_block_id].pack("H*"),
         @gas_limit,
         padded_address(@proposer_address),
         @proposer_key_index,
@@ -99,7 +100,7 @@ module FlowClient
     end
 
     def add_envelope_signature(signer_address, key_index, key)
-      domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack('C*')
+      domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack("C*")
 
       @envelope_signatures << Entities::Transaction::Signature.new(
         address: padded_address(signer_address),
@@ -135,7 +136,7 @@ module FlowClient
     protected
 
     def padded_address(address_hex_string)
-      Utils.left_pad_bytes([address_hex_string].pack('H*').bytes, 8).pack("C*")
+      Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")
     end
   end
 end
