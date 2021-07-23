@@ -146,6 +146,6 @@ RSpec.describe FlowClient::Transaction do
     it { expect(protobuf_message.payer).to eq(padded_address) }
     it { expect(protobuf_message.authorizers).to eq([padded_address]) }
     it { expect(protobuf_message.payload_signatures).to eq([]) }
-    it { expect(protobuf_message.envelope_signatures).to eq(@transaction.envelope_signatures) } 
+    it { expect(protobuf_message.envelope_signatures).to eq(@transaction.envelope_signatures) }
   end
 end
