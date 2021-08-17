@@ -1,6 +1,6 @@
 # FlowClient
 
-FlowClient is a Ruby client for the Flow blockchain (onflow.org)
+FlowClient is a Ruby gRPC client for the Flow blockchain (onflow.org)
 
 - [x] Ping the blockchain
 - [x] Get account information
@@ -37,7 +37,7 @@ res = client.ping
 res = client.execute_script(script, args)
 ```
 
-#### Using address aliases
+### Using address aliases
 
 Using address aliases is handy for switching between different environments.
 
