@@ -2,6 +2,12 @@
 
 FlowClient is a Ruby client for the Flow blockchain (onflow.org)
 
+- [x] Ping the blockchain
+- [x] Get account information
+- [x] Execute a script
+- [x] Single signature transactions
+- [ ] Multi signature transactions
+
 ## Installation
 
 Add this line to your application's Gemfile:
