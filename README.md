@@ -83,7 +83,10 @@ transaction.add_envelope_signature("0xAlice", 0, key)
 res = client.send_transaction(transaction)
 
 # Get a transaction
-client.send_transaction(res.id.unpack("H*"))
+client.get_transaction(res.id.unpack("H*"))
+
+# Get a transaction result
+client.get_transaction_result(res.id.unpack("H*"))
 ```
 
 Get a transaction
