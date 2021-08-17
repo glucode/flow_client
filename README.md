@@ -39,6 +39,8 @@ res = client.execute_script(script, args)
 
 #### Using address aliases
 
+Using address aliases is handy for switching between different environments.
+
 ```ruby
 cadence =  %{
     import FungibleToken from 0xFungibleToken
@@ -48,6 +50,7 @@ cadence =  %{
 
 client.address_aliases = { "0xFungibleToken": "0x123234545" }
 
+# 0xFungibleToken get resolved to the address "0x123234545"
 res = client.execute_script(cadence)
 ```
 
