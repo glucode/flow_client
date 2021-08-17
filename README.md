@@ -37,7 +37,25 @@ res = client.ping
 res = client.execute_script(script, args)
 ```
 
-### Using address aliases
+### Transactions
+
+```ruby
+transaction = FlowClient::Transaction.new
+transaction.script = cadence
+transaction.reference_block_id = ref_block_id
+transaction.proposer_address = "0xAlice"
+transaction.proposer_key_index = 0
+transaction.arguments = [
+  { type: "Address", value: user_address }.to_json
+]
+transaction.proposer_key_sequence_number = sequence_number
+transaction.payer_address = "76ecd94a2bb02327"
+transaction.authorizer_addresses = ["0xAlice"]
+transaction.add_envelope_signature("0xAlice", 0, key)
+res = client.send_transaction(transaction)
+```
+
+### Address alias resolution
 
 Using address aliases is handy for switching between different environments.
 
