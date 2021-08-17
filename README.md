@@ -46,7 +46,7 @@ res = client.ping
 ### Accounts
 
 ```ruby
-res = client.get_account("0xAlice)
+res = client.get_account("0xAlice")
 ```
 
 ### Events
