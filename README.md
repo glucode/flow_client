@@ -7,6 +7,8 @@ FlowClient is a Ruby gRPC client for the Flow blockchain (onflow.org)
 - [x] Execute a script
 - [x] Single signature transactions
 - [ ] Multi signature transactions
+- [ ] secp256k1 keys
+- [x] prime256v1 keys
 
 ## Installation
 
