@@ -43,6 +43,12 @@ Or install it yourself as:
 client = FlowClient::Client.new("access.devnet.nodes.onflow.org:9000")
 res = client.ping
 ```
+### Accounts
+
+```ruby
+res = client.get_account("0xAlice)
+```
+
 ### Events
 
 ```ruby
@@ -61,6 +67,7 @@ res = client.execute_script(script, args)
 ### Transactions
 
 ```ruby
+# Send a transaction with a single signer, proposer and authorizer
 transaction = FlowClient::Transaction.new
 transaction.script = cadence
 transaction.reference_block_id = ref_block_id
@@ -74,6 +81,15 @@ transaction.payer_address = "0xAlice"
 transaction.authorizer_addresses = ["0xAlice"]
 transaction.add_envelope_signature("0xAlice", 0, key)
 res = client.send_transaction(transaction)
+
+# Get a transaction
+client.send_transaction(res.id.unpack("H*"))
+```
+
+Get a transaction
+
+```ruby
+client.get_transaction(transaction_id)
 ```
 
 ### Address Alias Resolution
