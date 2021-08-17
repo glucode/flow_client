@@ -17,7 +17,8 @@ module FlowClient
                   :proposer_key_index,
                   :proposer_key_sequence_number,
                   :payer_address,
-                  :authorizer_addresses
+                  :authorizer_addresses,
+                  :address_aliases
 
     attr_reader :envelope_signatures, :payload_signatures
 
@@ -30,6 +31,7 @@ module FlowClient
       @payload_signatures = []
       @proposer_key_index = 0
       @proposer_key_sequence_number = 0
+      @address_aliases = {}
     end
 
     def self.padded_transaction_domain_tag
@@ -38,7 +40,7 @@ module FlowClient
 
     def payload_canonical_form
       [
-        @script,
+        resolved_script,
         @arguments,
         [@reference_block_id].pack("H*"),
         @gas_limit,
@@ -52,7 +54,6 @@ module FlowClient
 
     def payload_message
       payload = payload_canonical_form
-      puts payload.inspect
 
       # example = %w[248 114 176 116 114 97 110 115 97 99 116 105 111 110 32 123 32 101 120 101 99 117 116 101 32 123 32 108 111 103 40 34 72 101 108 108 111 44 32 87 111 114 108 100 33 34 41 32 125 32 125 192 160 72 121 153 246 93 184 142 181 159 21 71 108 105 182 234 79 105 166 51 159 166 79 128 92 248 80 65 251 159 240 90 36 100 136 243 252 210 193 167 143 94 238 128 128 136 243 252 210 193 167 143 94 238 201 136 243 252 210 193 167 143 94 238].map(&:to_i).pack("c*")
       # decoded_example = RLP.decode(example)
@@ -97,7 +98,6 @@ module FlowClient
       # puts "----------------"
       # puts RLP.encode(envelope_canonical_form).bytes.inspect
       # puts "**********"
-      envelope = envelope_canonical_form
       RLP.encode(envelope_canonical_form)
     end
 
@@ -136,6 +136,9 @@ module FlowClient
     end
 
     protected
+    def resolved_script
+      FlowClient::Utils.substitute_address_aliases(@script, @address_aliases)
+    end
 
     def padded_address(address_hex_string)
       Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")

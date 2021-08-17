@@ -8,8 +8,11 @@ require "json"
 module FlowClient
   # Flow client
   class Client
+    attr_accessor :address_aliases
+
     def initialize(node_address)
       @stub = Access::AccessAPI::Stub.new(node_address, :this_channel_is_insecure)
+      @address_aliases = {}
     end
 
     def ping
@@ -27,7 +30,7 @@ module FlowClient
     # Scripts
     def execute_script(script, args = [])
       req = Access::ExecuteScriptAtLatestBlockRequest.new(
-        script: script,
+        script: FlowClient::Utils.substitute_address_aliases(script, @address_aliases),
         arguments: args
       )
       res = @stub.execute_script_at_latest_block(req)
@@ -54,9 +57,12 @@ module FlowClient
     end
 
     # Transactions
+
+    # Send a FlowClient::Transaction transaction to the blockchain
     def send_transaction(transaction)
+      transaction.address_aliases = @address_aliases
       req = Access::SendTransactionRequest.new(
-        transaction: transaction
+        transaction: transaction.message
       )
       @stub.send_transaction(req)
     end
