@@ -37,6 +37,20 @@ res = client.ping
 res = client.execute_script(script, args)
 ```
 
+#### Using address aliases
+
+```ruby
+cadence =  %{
+    import FungibleToken from 0xFungibleToken
+    
+    ...
+}
+
+client.address_aliases = { "0xFungibleToken": "0x123234545" }
+
+res = client.execute_script(cadence)
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
