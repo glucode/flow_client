@@ -1,14 +1,24 @@
 # FlowClient
 
-FlowClient is a Ruby gRPC client for the Flow blockchain (onflow.org)
+FlowClient is a Ruby gRPC client for Flow (onflow.org)
 
-- [x] Ping the blockchain
+#### Accounts
 - [x] Get account information
-- [x] Execute a script
-- [x] Single signature transactions
-- [ ] Multi signature transactions
+
+#### Scripts
+- [x] Execute scripts
+
+#### Transactions
+- [x] Send a transaction
+- [x] Get a transaction
+- [x] Single account signing
+- [ ] Multi account signing
 - [ ] secp256k1 keys
 - [x] prime256v1 keys
+
+### Flow Data
+- [x] Get events
+- [x] Get block
 
 ## Installation
 
@@ -40,10 +50,15 @@ res = client.execute_script(script, args)
 ```
 ### Events
 
+```ruby
+get_events(type, start_height, end_height)
+res = client.get_events("A.0b2a3299cc857e29.TopShot.Deposit", 12913388, 12913389)
+```
+
 ### Scripts
 
 ```ruby
-args = { type: "Address", value: "0xAlice" }.to_json
+args = [{ type: "Address", value: "0xAlice" }.to_json]
 # Execute a Cadence script
 res = client.execute_script(script, args)
 ```
@@ -66,7 +81,7 @@ transaction.add_envelope_signature("0xAlice", 0, key)
 res = client.send_transaction(transaction)
 ```
 
-### Address alias resolution
+### Address Alias Resolution
 
 Using address aliases is handy for switching between different environments.
 
