@@ -38,6 +38,15 @@ res = client.ping
 # Execute a Cadence script
 res = client.execute_script(script, args)
 ```
+### Events
+
+### Scripts
+
+```ruby
+args = { type: "Address", value: "0xAlice" }.to_json
+# Execute a Cadence script
+res = client.execute_script(script, args)
+```
 
 ### Transactions
 
@@ -51,7 +60,7 @@ transaction.arguments = [
   { type: "Address", value: user_address }.to_json
 ]
 transaction.proposer_key_sequence_number = sequence_number
-transaction.payer_address = "76ecd94a2bb02327"
+transaction.payer_address = "0xAlice"
 transaction.authorizer_addresses = ["0xAlice"]
 transaction.add_envelope_signature("0xAlice", 0, key)
 res = client.send_transaction(transaction)

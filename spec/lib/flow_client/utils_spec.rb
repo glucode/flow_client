@@ -21,7 +21,10 @@ RSpec.describe FlowClient::Utils do
     end
 
     it "replaces import aliases" do
-      output = FlowClient::Utils.substitute_address_aliases(script, { "0xFUNGIBLE_TOKEN_ADDRESS": "0x01", "0xFUSD": "0x02" })
+      output = FlowClient::Utils.substitute_address_aliases(
+        script,
+        { "0xFUNGIBLE_TOKEN_ADDRESS": "0x01", "0xFUSD": "0x02" }
+      )
       expect(output.include?("import FungibleToken from 0xFUNGIBLE_TOKEN_ADDRESS")).to be(false)
       expect(output.include?("import FUSD from 0xFUSD")).to be(false)
     end

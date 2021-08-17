@@ -30,7 +30,7 @@ module FlowClient
     def self.substitute_address_aliases(script_or_transaction, aliases = {})
       new_string = script_or_transaction
       aliases.each do |key, value|
-        new_string = new_string.gsub("#{key}", "#{value}")
+        new_string = new_string.gsub(key.to_s, value.to_s)
       end
       new_string
     end

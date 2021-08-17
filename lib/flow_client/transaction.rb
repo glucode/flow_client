@@ -136,6 +136,7 @@ module FlowClient
     end
 
     protected
+
     def resolved_script
       FlowClient::Utils.substitute_address_aliases(@script, @address_aliases)
     end
