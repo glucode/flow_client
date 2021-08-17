@@ -41,12 +41,7 @@ Or install it yourself as:
 ```ruby
 # Connect to the Flow testnet
 client = FlowClient::Client.new("access.devnet.nodes.onflow.org:9000")
-
-# Ping the blockchain
 res = client.ping
-
-# Execute a Cadence script
-res = client.execute_script(script, args)
 ```
 ### Events
 
