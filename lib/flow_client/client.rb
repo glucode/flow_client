@@ -62,7 +62,7 @@ module FlowClient
     def send_transaction(transaction)
       transaction.address_aliases = @address_aliases
       req = Access::SendTransactionRequest.new(
-        transaction: transaction.message
+        transaction: transaction.to_protobuf_message
       )
       @stub.send_transaction(req)
     end
