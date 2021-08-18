@@ -46,19 +46,21 @@ res = client.ping
 ### Accounts
 
 ```ruby
+# get_account(account_address)
 res = client.get_account("0xAlice")
 ```
 
 ### Events
 
 ```ruby
-get_events(type, start_height, end_height)
+# get_events(type, start_height, end_height)
 res = client.get_events("A.0b2a3299cc857e29.TopShot.Deposit", 12913388, 12913389)
 ```
 
 ### Scripts
 
 ```ruby
+# execute_script(cadence_string, args_array)
 args = [{ type: "Address", value: "0xAlice" }.to_json]
 # Execute a Cadence script
 res = client.execute_script(script, args)
@@ -83,16 +85,12 @@ transaction.add_envelope_signature("0xAlice", 0, key)
 res = client.send_transaction(transaction)
 
 # Get a transaction
+# get_transaction(transaction_id)
 client.get_transaction(res.id.unpack("H*"))
 
 # Get a transaction result
+# get_transaction_result(transaction_id)
 client.get_transaction_result(res.id.unpack("H*"))
-```
-
-Get a transaction
-
-```ruby
-client.get_transaction(transaction_id)
 ```
 
 ### Address Alias Resolution
