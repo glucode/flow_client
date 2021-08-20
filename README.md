@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/flow_client.svg)](https://badge.fury.io/rb/flow_client)
+
 # FlowClient
 
 FlowClient is a Ruby gRPC client for Flow (onflow.org)
