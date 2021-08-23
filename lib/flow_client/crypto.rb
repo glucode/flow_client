@@ -3,6 +3,7 @@
 require "openssl"
 
 module FlowClient
+  # Crypto helpers
   class Crypto
     def self.sign(data, key)
       digest = OpenSSL::Digest.digest("SHA3-256", data)
