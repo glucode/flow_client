@@ -29,7 +29,7 @@ module FlowClient
         [
           OpenSSL::ASN1::Integer(1),
           OpenSSL::ASN1::OctetString([private_hex].pack("H*")),
-          OpenSSL::ASN1::ObjectId("prime256v1", 0, :EXPLICIT),
+          OpenSSL::ASN1::ObjectId(Crypto::Curves::P256, 0, :EXPLICIT),
           OpenSSL::ASN1::BitString([public_hex].pack("H*"), 1, :EXPLICIT)
         ]
       )
