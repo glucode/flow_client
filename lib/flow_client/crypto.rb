@@ -5,6 +5,12 @@ require "openssl"
 module FlowClient
   # Crypto helpers
   class Crypto
+    module Curves
+      P256 = "prime256v1"
+      SECP256K1 = "secp256k1"
+    end
+
+    # Sign data using the provided key
     def self.sign(data, key)
       digest = OpenSSL::Digest.digest("SHA3-256", data)
       asn = key.dsa_sign_asn1(digest)
@@ -29,6 +35,19 @@ module FlowClient
       )
 
       OpenSSL::PKey::EC.new(asn1.to_der)
+    end
+
+    # Returns an octet string keypair.
+    #
+    # Supported ECC curves are:
+    # Crypto::Curves::P256
+    # Crypto::Curves::SECP256K1
+    def self.generate_keys(curve)
+      key = OpenSSL::PKey::EC.new(curve).generate_key
+      [
+        key.private_key.to_s(16).downcase,
+        key.public_key.to_bn.to_s(16).downcase
+      ]
     end
   end
 end
