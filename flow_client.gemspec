@@ -30,8 +30,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "digest-sha3"
-  spec.add_dependency "ecdsa"
   spec.add_dependency "grpc"
   spec.add_dependency "grpc-tools"
   spec.add_dependency "json"
