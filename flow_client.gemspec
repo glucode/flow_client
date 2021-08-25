@@ -7,7 +7,6 @@ Gem::Specification.new do |spec|
   spec.version       = FlowClient::VERSION
   spec.authors       = ["Nico du Plessis"]
   spec.email         = ["nico@glucode.com"]
-
   spec.summary       = "A Ruby client for the Flow blockchain"
   spec.description   = "A Ruby client for the Flow blockchain"
   spec.homepage      = "https://github.com/glucode/flow_client"
