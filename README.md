@@ -71,9 +71,6 @@ res = client.execute_script(script, args)
 ### Transactions
 
 ```ruby
-# Construct a key - left pad with 0x04 to indicate it is uncompressed
-# as per https://datatracker.ietf.org/doc/html/rfc5480. You can generate keys
-# using the Flow CLI command `flow keys generate`
 key = FlowClient::Crypto.key_from_hex_keys(
   "<priv key hex>"
 )
