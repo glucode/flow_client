@@ -75,8 +75,7 @@ res = client.execute_script(script, args)
 # as per https://datatracker.ietf.org/doc/html/rfc5480. You can generate keys
 # using the Flow CLI command `flow keys generate`
 key = FlowClient::Crypto.key_from_hex_keys(
-  "<priv key hex>",
-  "04<public key hex>"
+  "<priv key hex>"
 )
 
 # Send a transaction with a single signer, proposer and authorizer

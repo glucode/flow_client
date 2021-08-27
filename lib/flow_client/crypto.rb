@@ -26,17 +26,12 @@ module FlowClient
     #
     # secp256k1
     # prime256v1
-    def self.key_from_hex_keys(private_hex, public_hex, algo = Curves::P256)
-      asn1 = OpenSSL::ASN1::Sequence(
-        [
-          OpenSSL::ASN1::Integer(1),
-          OpenSSL::ASN1::OctetString([private_hex].pack("H*")),
-          OpenSSL::ASN1::ObjectId(algo, 0, :EXPLICIT),
-          OpenSSL::ASN1::BitString([public_hex].pack("H*"), 1, :EXPLICIT)
-        ]
-      )
-
-      OpenSSL::PKey::EC.new(asn1.to_der)
+    def self.key_from_hex_keys(private_hex, algo = Curves::P256)
+      group = OpenSSL::PKey::EC::Group.new(algo)
+      new_key = OpenSSL::PKey::EC.new(group)
+      new_key.private_key = OpenSSL::BN.new(private_hex, 16)
+      new_key.public_key = group.generator.mul(new_key.private_key)
+      new_key
     end
 
     # Returns an octet string keypair.
