@@ -25,19 +25,19 @@ RSpec.describe FlowClient::Transaction do
   describe "key generation" do
     it "generates valid prime256v1 keys" do
       private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::P256)
-      opensslKey = FlowClient::Crypto.key_from_hex_keys(
+      openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key
       )
-      expect(opensslKey).to be_a(OpenSSL::PKey::EC)
+      expect(openssl_key).to be_a(OpenSSL::PKey::EC)
     end
 
     it "generates valid secp256k1 keys" do
       private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::SECP256K1)
-      opensslKey = FlowClient::Crypto.key_from_hex_keys(
+      openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key,
         FlowClient::Crypto::Curves::SECP256K1
       )
-      expect(opensslKey).to be_a(OpenSSL::PKey::EC)
+      expect(openssl_key).to be_a(OpenSSL::PKey::EC)
     end
   end
 end
