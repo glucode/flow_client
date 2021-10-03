@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FlowClient
+  # A collection of utilities.
   module Utils
     # Left pads a byte array with 0 to length
     def self.left_pad_bytes(byte_array, length)

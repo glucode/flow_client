@@ -15,16 +15,11 @@ RSpec.describe FlowClient::Transaction do
     it "imports a key a hex string key pair for prime256v1" do
       expect(key.private?).to eq(true)
     end
-
-    it "correctly signs data" do
-      data = "hello world!"
-      sig = FlowClient::Crypto.sign(data, key)
-    end
   end
 
   describe "key generation" do
     it "generates valid prime256v1 keys" do
-      private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::P256)
+      private_key, _public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::P256)
       openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key
       )
@@ -32,7 +27,7 @@ RSpec.describe FlowClient::Transaction do
     end
 
     it "generates valid secp256k1 keys" do
-      private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::SECP256K1)
+      private_key, _public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::SECP256K1)
       openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key,
         FlowClient::Crypto::Curves::SECP256K1
