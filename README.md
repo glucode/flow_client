@@ -1,4 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/flow_client.svg)](https://badge.fury.io/rb/flow_client)
+![Rubocop Analysis](https://github.com/glucode/flow_client/actions/workflows/rubocop-analysis.yml/badge.svg)
+![RSpec Tests](https://github.com/glucode/flow_client/actions/workflows/ruby.yml/badge.svg)
 
 # FlowClient
 
