@@ -17,13 +17,9 @@ GEM
     ffi (1.15.4)
     formatador (0.3.0)
     google-protobuf (3.18.0-universal-darwin)
-    google-protobuf (3.18.0-x86_64-linux)
     googleapis-common-protos-types (1.2.0)
       google-protobuf (~> 3.14)
     grpc (1.41.0-universal-darwin)
-      google-protobuf (~> 3.17)
-      googleapis-common-protos-types (~> 1.0)
-    grpc (1.41.0-x86_64-linux)
       google-protobuf (~> 3.17)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.41.0)
@@ -97,7 +93,6 @@ GEM
 
 PLATFORMS
   x86_64-darwin-20
-  x86_64-linux
 
 DEPENDENCIES
   flow_client!
@@ -107,4 +102,4 @@ DEPENDENCIES
   rubocop (~> 1.22)
 
 BUNDLED WITH
-   2.2.22
+   2.2.26
