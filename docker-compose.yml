@@ -1,0 +1,12 @@
+version: "3"
+services:
+  emulator:
+    image: gcr.io/flow-container-registry/emulator:v0.22.0
+    ports:
+      - "8080:8080"
+      - "3569:3569"
+    environment:
+      - FLOW_SERVICEPRIVATEKEY=4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f
+      - FLOW_SERVICEKEYSIGALGO=ECDSA_P256
+      - FLOW_SERVICEKEYHASHALGO=SHA3_256
+      - FLOW_VERBOSE=true

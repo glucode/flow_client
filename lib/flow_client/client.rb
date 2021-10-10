@@ -21,10 +21,16 @@ module FlowClient
     end
 
     # Accounts
+
+    # Gets account detail for address
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
       res = @stub.get_account_at_latest_block(req)
       res.account
+    end
+
+    # Create a new account
+    def create_account()
     end
 
     # Scripts

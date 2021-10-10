@@ -39,8 +39,8 @@ module FlowClient
     # Crypto::Curves::SECP256K1
     #
     # Usage example:
-    # private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::P256)
-    def self.generate_keys(curve)
+    # private_key, public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
+    def self.generate_key(curve = Curves::P256)
       key = OpenSSL::PKey::EC.new(curve).generate_key
       [
         key.private_key.to_s(16).downcase,

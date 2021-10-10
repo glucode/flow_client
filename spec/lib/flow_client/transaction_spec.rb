@@ -98,6 +98,12 @@ RSpec.describe FlowClient::Transaction do
     end
   end
 
+  describe "payload signatures" do
+    it "adds a payload signature" do
+      exp
+    end
+  end
+
   describe "to_protobuf_message" do
     let(:script) do
       %{
