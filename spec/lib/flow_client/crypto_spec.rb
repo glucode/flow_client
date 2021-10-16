@@ -34,5 +34,12 @@ RSpec.describe FlowClient::Transaction do
       )
       expect(openssl_key).to be_a(OpenSSL::PKey::EC)
     end
+
+    it "strips the uncompressed header" do
+      _private_key, public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
+      expect(public_key[0..1]).not_to eq('04')
+      expect(public_key.length).to eq(128)
+      puts public_key
+    end
   end
 end

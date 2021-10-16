@@ -38,13 +38,17 @@ module FlowClient
     # Crypto::Curves::P256
     # Crypto::Curves::SECP256K1
     #
+    # The 04 prefix indicating that the public key is uncompressed is stripped.
+    # https://datatracker.ietf.org/doc/html/rfc5480
+    #
     # Usage example:
     # private_key, public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
     def self.generate_key(curve = Curves::P256)
       key = OpenSSL::PKey::EC.new(curve).generate_key
+      public_key = key.public_key.to_bn.to_s(16).downcase
       [
         key.private_key.to_s(16).downcase,
-        key.public_key.to_bn.to_s(16).downcase
+        public_key[2..public_key.length]
       ]
     end
   end
