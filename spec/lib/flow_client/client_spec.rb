@@ -12,7 +12,8 @@ RSpec.describe FlowClient::Transaction do
   context "accounts" do
     describe "create_account" do
       before(:each) do
-        @priv_key,   = FlowClient::Crypto.generate_key
+        @priv_key, @pub_key = FlowClient::Crypto.generate_key
+        puts @pub_key
 
         @service_account_key = FlowClient::Crypto.key_from_hex_keys(
           "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
@@ -22,7 +23,6 @@ RSpec.describe FlowClient::Transaction do
       it "creates a new account" do
         path = File.join("lib", "cadence", "templates", "create-account.cdc")
         script = File.read(path)
-        puts script
 
         arguments = [
           {
@@ -31,10 +31,12 @@ RSpec.describe FlowClient::Transaction do
               { type: "String", value: @pub_key }
             ]
           }.to_json,
-          {}.to_json
+          {
+            type: "Dictionary",
+            value: [
+            ]
+          }.to_json
         ]
-
-        puts client.get_latest_block().block.id.unpack1("H*").inspect
   
         transaction = FlowClient::Transaction.new
         transaction.script = script
@@ -46,13 +48,8 @@ RSpec.describe FlowClient::Transaction do
         transaction.payer_address = "f8d6e0586b0a20c7"
         transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
         transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, @service_account_key)
-        res = client.send_transaction(transaction)
-  
-        puts res.inspect
-        
+        res = client.send_transaction(transaction)        
       end
-
-
     end
   end
 end
