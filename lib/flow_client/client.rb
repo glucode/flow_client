@@ -30,7 +30,38 @@ module FlowClient
     end
 
     # Create a new account
-    def create_account()
+    def create_account(account_pub_key, payer_account)
+      script = File.read(File.join("lib", "cadence", "templates", "create-account.cdc"))
+
+      arguments = [
+        {
+          type: "Array",
+          value: [
+            { type: "String", value: @pub_key }
+          ]
+        }.to_json,
+        {
+          type: "Dictionary",
+          value: [
+          ]
+        }.to_json
+      ]
+
+      transaction = FlowClient::Transaction.new
+      transaction.script = script
+      transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+      transaction.proposer_address = "f8d6e0586b0a20c7"
+      transaction.proposer_key_index = 0
+      transaction.arguments = arguments
+      transaction.proposer_key_sequence_number = client.get_account("f8d6e0586b0a20c7").keys.first.sequence_number
+      transaction.payer_address = "f8d6e0586b0a20c7"
+      transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
+      transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, @service_account_key)
+      res = client.send_transaction(transaction)
+
+      client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+        expect(response.events.select{ |e| e.type == 'flow.AccountCreated' }).not_to be(nil)
+      end
     end
 
     # Scripts
@@ -85,6 +116,16 @@ module FlowClient
         id: to_bytes(transaction_id)
       )
       @stub.get_transaction_result(req)
+    end
+
+    def wait_for_transaction(transaction_id)
+      response = get_transaction_result(transaction_id)
+      while response.status != :SEALED
+        sleep(1)
+        response = get_transaction_result(transaction_id)
+      end
+
+      yield(response)
     end
 
     private

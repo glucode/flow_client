@@ -13,7 +13,6 @@ RSpec.describe FlowClient::Transaction do
     describe "create_account" do
       before(:each) do
         @priv_key, @pub_key = FlowClient::Crypto.generate_key
-        puts @pub_key
 
         @service_account_key = FlowClient::Crypto.key_from_hex_keys(
           "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
@@ -48,7 +47,11 @@ RSpec.describe FlowClient::Transaction do
         transaction.payer_address = "f8d6e0586b0a20c7"
         transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
         transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, @service_account_key)
-        res = client.send_transaction(transaction)        
+        res = client.send_transaction(transaction)
+
+        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+          expect(response.events.select{ |e| e.type == 'flow.AccountCreated' }).not_to be(nil)
+        end
       end
     end
   end

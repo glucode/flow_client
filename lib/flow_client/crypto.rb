@@ -30,7 +30,7 @@ module FlowClient
       new_key.private_key = OpenSSL::BN.new(private_hex, 16)
       new_key.public_key = group.generator.mul(new_key.private_key)
       new_key
-    end
+    end  
 
     # Returns an octet string keypair.
     #
