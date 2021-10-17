@@ -3,11 +3,13 @@
 require "rlp"
 
 RSpec.describe FlowClient::Transaction do
-  let(:reference_block_id) { "7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7" }
+  let(:service_account_address) { "f8d6e0586b0a20c7" }
+  let(:client) { FlowClient::Client.new("localhost:3569") }
+  let(:reference_block_id) {  client.get_latest_block().block.id.unpack1("H*") }
 
   let(:key) do
     FlowClient::Crypto.key_from_hex_keys(
-      "81c9655ca2affbd3421c90a1294260b62f1fd4e9aaeb70da4b9185ebb4f4a26b"
+      "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
     )
   end
 
@@ -62,27 +64,23 @@ RSpec.describe FlowClient::Transaction do
     end
 
     let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
-
     let(:gas_limit) { 100 }
-
-    let(:original_address) { "f8d6e0586b0a20c7" }
-
     let(:padded_address) do
-      FlowClient::Utils.left_pad_bytes(["f8d6e0586b0a20c7"].pack("H*").bytes, 8).pack("C*")
+      FlowClient::Utils.left_pad_bytes([service_account_address].pack("H*").bytes, 8).pack("C*")
     end
 
     let(:transaction) do
       @transaction = FlowClient::Transaction.new
       @transaction.script = script
-      @transaction.reference_block_id = reference_block_id
+      # @transaction.reference_block_id = reference_block_id
       @transaction.gas_limit = gas_limit
-      @transaction.proposer_address = original_address
-      @transaction.proposer_key_index = 1
+      @transaction.proposer_address = service_account_address
+      @transaction.proposer_key_index = 0
       @transaction.arguments = arguments
-      @transaction.proposer_key_sequence_number = 10
-      @transaction.payer_address = original_address
-      @transaction.authorizer_addresses = [original_address]
-      @transaction.add_envelope_signature(original_address, 0, key)
+      # @transaction.proposer_key_sequence_number = 10
+      @transaction.payer_address = service_account_address
+      @transaction.authorizer_addresses = [service_account_address]
+      
       @transaction.to_protobuf_message
       @transaction
     end
@@ -93,14 +91,27 @@ RSpec.describe FlowClient::Transaction do
       end
 
       it "has a valid signature" do
-        # @transaction.
+        service_key = client.get_account(service_account_address).keys.first
+
+        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        transaction.proposer_address = service_account_address
+        transaction.proposer_key_index = service_key.index
+        transaction.proposer_key_sequence_number = service_key.sequence_number
+        transaction.payer_address = service_account_address
+        transaction.authorizer_addresses = [service_account_address]
+        transaction.add_envelope_signature(service_account_address, 0, key)
+
+        res = client.send_transaction(transaction)
+        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+          expect(response.status_code).to be(0)
+        end
       end
     end
   end
 
   describe "payload signatures" do
     it "adds a payload signature" do
-      exp
+
     end
   end
 
@@ -116,7 +127,7 @@ RSpec.describe FlowClient::Transaction do
 
     let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
     let(:gas_limit) { 100 }
-    let(:original_address) { "f8d6e0586b0a20c7" }
+    let(:service_account_address) { "f8d6e0586b0a20c7" }
 
     let(:padded_address) do
       FlowClient::Utils.left_pad_bytes(["f8d6e0586b0a20c7"].pack("H*").bytes, 8).pack("C*")
@@ -127,13 +138,13 @@ RSpec.describe FlowClient::Transaction do
       @transaction.script = script
       @transaction.reference_block_id = reference_block_id
       @transaction.gas_limit = gas_limit
-      @transaction.proposer_address = original_address
+      @transaction.proposer_address = service_account_address
       @transaction.proposer_key_index = 1
       @transaction.arguments = arguments
       @transaction.proposer_key_sequence_number = 10
-      @transaction.payer_address = original_address
-      @transaction.authorizer_addresses = [original_address]
-      @transaction.add_envelope_signature(original_address, 0, key)
+      @transaction.payer_address = service_account_address
+      @transaction.authorizer_addresses = [service_account_address]
+      @transaction.add_envelope_signature(service_account_address, 0, key)
       @transaction.to_protobuf_message
     end
 

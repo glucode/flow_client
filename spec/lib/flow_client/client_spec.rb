@@ -2,6 +2,7 @@
 
 RSpec.describe FlowClient::Transaction do
   let(:client) { FlowClient::Client.new("localhost:3569") }
+  let(:service_account_address) { "f8d6e0586b0a20c7" }
 
   describe "ping" do
     it "pings the " do
@@ -40,13 +41,13 @@ RSpec.describe FlowClient::Transaction do
         transaction = FlowClient::Transaction.new
         transaction.script = script
         transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
-        transaction.proposer_address = "f8d6e0586b0a20c7"
+        transaction.proposer_address = service_account_address
         transaction.proposer_key_index = 0
         transaction.arguments = arguments
-        transaction.proposer_key_sequence_number = client.get_account("f8d6e0586b0a20c7").keys.first.sequence_number
-        transaction.payer_address = "f8d6e0586b0a20c7"
-        transaction.authorizer_addresses = ["f8d6e0586b0a20c7"]
-        transaction.add_envelope_signature("f8d6e0586b0a20c7", 0, @service_account_key)
+        transaction.proposer_key_sequence_number = client.get_account(service_account_address).keys.first.sequence_number
+        transaction.payer_address = service_account_address
+        transaction.authorizer_addresses = [service_account_address]
+        transaction.add_envelope_signature(service_account_address, 0, @service_account_key)
         res = client.send_transaction(transaction)
 
         client.wait_for_transaction(res.id.unpack1("H*")) do |response|
