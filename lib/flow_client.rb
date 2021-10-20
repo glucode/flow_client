@@ -11,4 +11,6 @@ module FlowClient
   require "flow_client/utils"
   require "flow_client/client"
   require "flow_client/transaction"
+  require "flow_client/account"
+  require "flow_client/signer"
 end

@@ -69,39 +69,92 @@ RSpec.describe FlowClient::Transaction do
       FlowClient::Utils.left_pad_bytes([service_account_address].pack("H*").bytes, 8).pack("C*")
     end
 
+    let(:service_account_key) { client.get_account(service_account_address).keys.first }
+
     let(:transaction) do
       @transaction = FlowClient::Transaction.new
       @transaction.script = script
-      # @transaction.reference_block_id = reference_block_id
+      @transaction.reference_block_id = reference_block_id
       @transaction.gas_limit = gas_limit
       @transaction.proposer_address = service_account_address
-      @transaction.proposer_key_index = 0
+      @transaction.proposer_key_index = service_account_key.index
       @transaction.arguments = arguments
-      # @transaction.proposer_key_sequence_number = 10
+      @transaction.proposer_key_sequence_number = service_account_key.sequence_number
       @transaction.payer_address = service_account_address
       @transaction.authorizer_addresses = [service_account_address]
-      
-      @transaction.to_protobuf_message
       @transaction
     end
 
     context "single proposer, payer and signer" do
-      it "has no payload signatures" do
-        expect(transaction.payload_signatures).to eq([])
-      end
-
       it "has a valid signature" do
-        service_key = client.get_account(service_account_address).keys.first
-
-        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
-        transaction.proposer_address = service_account_address
-        transaction.proposer_key_index = service_key.index
-        transaction.proposer_key_sequence_number = service_key.sequence_number
-        transaction.payer_address = service_account_address
-        transaction.authorizer_addresses = [service_account_address]
-        transaction.add_envelope_signature(service_account_address, 0, key)
+        signer = FlowClient::LocalSigner.new(key)
+        transaction.add_envelope_signature(service_account_address, 0, signer)
 
         res = client.send_transaction(transaction)
+        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+          expect(response.status_code).to be(0)
+        end
+      end
+    end
+
+    context  "single party, multiple signatures" do
+      # priv_key_one, pub_key_one = FlowClient::Crypto.generate_key
+      # priv_key_two, pub_key_two = FlowClient::Crypto.generate_key
+      # @service_account_key = FlowClient::Crypto.key_from_hex_keys(
+      #   "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
+      # )
+      # signer = FlowClient::LocalSigner.new(@service_account_key)
+      # payer_account = FlowClient::Account.new(address: service_account_address)
+      # new_account = client.create_account(@pub_key, payer_account, signer)
+    end
+
+    context "multi party signing" do
+      it "has a valid signature" do
+        @priv_key, @pub_key = FlowClient::Crypto.generate_key
+
+        ###########################################################
+
+        path = File.join("lib", "cadence", "templates", "create-account.cdc")
+        script = File.read(path)
+
+        arguments = [
+          {
+            type: "Array",
+            value: [
+              { type: "String", value: @pub_key }
+            ]
+          }.to_json,
+          {
+            type: "Dictionary",
+            value: [
+            ]
+          }.to_json
+        ]
+  
+        signer = FlowClient::LocalSigner.new(key)
+        new_account_tx = FlowClient::Transaction.new
+        new_account_tx.script = script
+        new_account_tx.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        new_account_tx.proposer_address = service_account_address
+        new_account_tx.proposer_key_index = 0
+        new_account_tx.arguments = arguments
+        new_account_tx.proposer_key_sequence_number = client.get_account(service_account_address).keys.first.sequence_number
+        new_account_tx.payer_address = service_account_address
+        new_account_tx.authorizer_addresses = [service_account_address]
+        new_account_tx.add_envelope_signature(service_account_address, 0, signer)
+        res = client.send_transaction(new_account_tx)
+
+        new_address = nil
+        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+          account_event = response.events.select{ |e| e.type == 'flow.AccountCreated' }.first
+          new_address = JSON.parse(account_event.payload)["value"]["fields"][0]["value"]["value"]
+        end
+        
+        ###########################################################
+
+        transaction.add_envelope_signature(service_account_address, 0, signer)
+        res = client.send_transaction(transaction)
+
         client.wait_for_transaction(res.id.unpack1("H*")) do |response|
           expect(response.status_code).to be(0)
         end
@@ -134,6 +187,7 @@ RSpec.describe FlowClient::Transaction do
     end
 
     let(:protobuf_message) do
+      signer = FlowClient::LocalSigner.new(key)
       @transaction = FlowClient::Transaction.new
       @transaction.script = script
       @transaction.reference_block_id = reference_block_id
@@ -144,7 +198,7 @@ RSpec.describe FlowClient::Transaction do
       @transaction.proposer_key_sequence_number = 10
       @transaction.payer_address = service_account_address
       @transaction.authorizer_addresses = [service_account_address]
-      @transaction.add_envelope_signature(service_account_address, 0, key)
+      @transaction.add_envelope_signature(service_account_address, 0, signer)
       @transaction.to_protobuf_message
     end
 

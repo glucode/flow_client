@@ -11,48 +11,51 @@ RSpec.describe FlowClient::Transaction do
   end
 
   context "accounts" do
+    describe "get_account" do
+      it "returns an account object" do
+        account = client.get_account(service_account_address)
+        expect(account).to be_an_instance_of(FlowClient::Account)
+        expect(account.address).not_to be_nil
+        expect(account.balance).not_to be_nil
+        expect(account.keys).not_to be_nil
+      end
+    end
+
     describe "create_account" do
       before(:each) do
         @priv_key, @pub_key = FlowClient::Crypto.generate_key
-
         @service_account_key = FlowClient::Crypto.key_from_hex_keys(
           "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
         )
       end
 
       it "creates a new account" do
-        path = File.join("lib", "cadence", "templates", "create-account.cdc")
-        script = File.read(path)
+        signer = FlowClient::LocalSigner.new(@service_account_key)
+        payer_account = FlowClient::Account.new(address: service_account_address)
+        new_account = client.create_account(@pub_key, payer_account, signer)
 
-        arguments = [
-          {
-            type: "Array",
-            value: [
-              { type: "String", value: @pub_key }
-            ]
-          }.to_json,
-          {
-            type: "Dictionary",
-            value: [
-            ]
-          }.to_json
-        ]
-  
-        transaction = FlowClient::Transaction.new
-        transaction.script = script
-        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
-        transaction.proposer_address = service_account_address
-        transaction.proposer_key_index = 0
-        transaction.arguments = arguments
-        transaction.proposer_key_sequence_number = client.get_account(service_account_address).keys.first.sequence_number
-        transaction.payer_address = service_account_address
-        transaction.authorizer_addresses = [service_account_address]
-        transaction.add_envelope_signature(service_account_address, 0, @service_account_key)
-        res = client.send_transaction(transaction)
+        expect(new_account).to be_an_instance_of(FlowClient::Account)
+        expect(new_account.address).not_to be_nil
+        expect(new_account.balance).not_to be_nil
+        expect(new_account.keys).not_to be_nil
+      end
+    end
 
-        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
-          expect(response.events.select{ |e| e.type == 'flow.AccountCreated' }).not_to be(nil)
-        end
+    describe "add_account_key" do
+      it "adds the key to the account" do
+        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key
+        priv_key_two, pub_key_two = FlowClient::Crypto.generate_key
+        @service_account_key = FlowClient::Crypto.key_from_hex_keys(
+          "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
+        )
+
+        signer = FlowClient::LocalSigner.new(@service_account_key)
+        payer_account = FlowClient::Account.new(address: service_account_address)
+        new_account = client.create_account(pub_key_one, payer_account, signer)
+
+        client.add_account_key(new_account.address, pub_key_two, payer_account, signer)
+
+        # expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
     end
   end

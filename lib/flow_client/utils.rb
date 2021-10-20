@@ -35,5 +35,9 @@ module FlowClient
       end
       new_string
     end
+
+    def self.strip_address_prefix(address)
+      address[0..1]
+    end
   end
 end
