@@ -53,9 +53,13 @@ RSpec.describe FlowClient::Transaction do
         payer_account = FlowClient::Account.new(address: service_account_address)
         new_account = client.create_account(pub_key_one, payer_account, signer)
 
-        client.add_account_key(new_account.address, pub_key_two, payer_account, signer)
+        new_account_key = FlowClient::Crypto.key_from_hex_keys(
+          priv_key_one
+        )
+        signer = FlowClient::LocalSigner.new(new_account_key)
+        client.add_account_key(new_account.address, pub_key_two, new_account, signer)
 
-        # expect(client.get_account(new_account.address).keys.count).to eq(2)
+        expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
     end
   end

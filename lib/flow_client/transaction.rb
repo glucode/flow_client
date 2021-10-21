@@ -54,9 +54,18 @@ module FlowClient
     end
 
     def envelope_canonical_form
+      signatures = []
+      @payload_signatures.each_with_index do |sig, index|
+        signatures << [
+          index,
+          sig.key_id,
+          sig.signature
+        ]
+      end
+
       [
         payload_canonical_form,
-        []
+        signatures
       ]
     end
 
@@ -64,10 +73,24 @@ module FlowClient
       RLP.encode(envelope_canonical_form)
     end
 
+    def payload_message
+      RLP.encode(payload_canonical_form)
+    end
+
     def add_envelope_signature(signer_address, key_index, signer)
-      domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack("C*")
+      domain_tagged_envelope = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack("C*")
 
       @envelope_signatures << Entities::Transaction::Signature.new(
+        address: padded_address(signer_address),
+        key_id: key_index,
+        signature: signer.sign(domain_tagged_envelope)
+      )
+    end
+
+    def add_payload_signature(signer_address, key_index, signer)
+      domain_tagged_payload = (Transaction.padded_transaction_domain_tag.bytes + payload_message.bytes).pack("C*")
+
+      @payload_signatures << Entities::Transaction::Signature.new(
         address: padded_address(signer_address),
         key_id: key_index,
         signature: signer.sign(domain_tagged_payload)
