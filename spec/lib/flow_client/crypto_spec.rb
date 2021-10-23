@@ -19,7 +19,7 @@ RSpec.describe FlowClient::Transaction do
 
   describe "key generation" do
     it "generates valid prime256v1 keys" do
-      private_key, _public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
+      private_key, _public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
       openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key
       )
@@ -27,7 +27,7 @@ RSpec.describe FlowClient::Transaction do
     end
 
     it "generates valid secp256k1 keys" do
-      private_key, _public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::SECP256K1)
+      private_key, _public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::SECP256K1)
       openssl_key = FlowClient::Crypto.key_from_hex_keys(
         private_key,
         FlowClient::Crypto::Curves::SECP256K1
@@ -36,7 +36,7 @@ RSpec.describe FlowClient::Transaction do
     end
 
     it "strips the uncompressed header" do
-      _private_key, public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
+      _private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
       expect(public_key[0..1]).not_to eq('04')
       expect(public_key.length).to eq(128)
       puts public_key

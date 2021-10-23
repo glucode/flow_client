@@ -97,24 +97,18 @@ RSpec.describe FlowClient::Transaction do
       end
     end
 
-    context  "single party, multiple signatures" do
+    context "single party, multiple signatures" do
       it "successfully signs with mutliple signatures" do
-        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key
-        priv_key_two, pub_key_two = FlowClient::Crypto.generate_key
-        @service_account_key = FlowClient::Crypto.key_from_hex_keys(
-          "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-        )
+        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
+        priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
 
-        signer = FlowClient::LocalSigner.new(@service_account_key)
+        signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
         new_account = client.create_account(pub_key_one, payer_account, signer)
 
-        new_account_key_one = FlowClient::Crypto.key_from_hex_keys(
-          priv_key_one
-        )
-        new_account_key_two = FlowClient::Crypto.key_from_hex_keys(
-          priv_key_two
-        )
+        new_account_key_one = FlowClient::Crypto.key_from_hex_keys(priv_key_one)
+        new_account_key_two = FlowClient::Crypto.key_from_hex_keys(priv_key_two)
+
         signer = FlowClient::LocalSigner.new(new_account_key_one)
         signer_two = FlowClient::LocalSigner.new(new_account_key_two)
         client.add_account_key(new_account.address, pub_key_two, new_account, signer)
@@ -143,8 +137,8 @@ RSpec.describe FlowClient::Transaction do
     end
 
     context "multiple parties" do
-      it "has a valid signature" do
-        authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key
+      it "successfully signs with a single signature" do
+        authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
 
         service_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(
@@ -153,11 +147,51 @@ RSpec.describe FlowClient::Transaction do
           )
         )
 
-        @service_account_key = FlowClient::Crypto.key_from_hex_keys(
+
+        payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
+
+        # Create a new account that will be executing the transaction
+        new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
+        authorizer_signer = FlowClient::LocalSigner.new(
+          FlowClient::Crypto.key_from_hex_keys(
+            authorizer_priv_key
+          )
+        )
+
+        transaction = FlowClient::Transaction.new
+        transaction.script = script
+        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        transaction.proposer_address = new_account.address
+        transaction.proposer_key_index = new_account.keys.first.index
+        transaction.arguments = arguments
+        transaction.proposer_key_sequence_number = new_account.keys.first.sequence_number
+        transaction.authorizer_addresses = [new_account.address]
+        transaction.payer_address = service_account_address
+        transaction.add_payload_signature(new_account.address, new_account.keys.first.index, authorizer_signer)
+        transaction.add_envelope_signature(service_account_address, service_account.keys.first.index, payer_signer)
+        
+        res = client.send_transaction(transaction)
+
+        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+          expect(response.status_code).to be(0)
+        end
+      end
+
+      it "successfully signs with multiple signatures" do
+        authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
+
+        service_account = client.get_account(service_account_address)
+        payer_signer = FlowClient::LocalSigner.new(
+          FlowClient::Crypto.key_from_hex_keys(
+            "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
+          )
+        )
+
+        service_account_private_key = FlowClient::Crypto.key_from_hex_keys(
           "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
         )
 
-        payer_signer = FlowClient::LocalSigner.new(@service_account_key)
+        payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
 
         # Create a new account that will be executing the transaction
         new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)

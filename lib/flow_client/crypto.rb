@@ -42,8 +42,8 @@ module FlowClient
     # https://datatracker.ietf.org/doc/html/rfc5480
     #
     # Usage example:
-    # private_key, public_key = FlowClient::Crypto.generate_key(FlowClient::Crypto::Curves::P256)
-    def self.generate_key(curve = Curves::P256)
+    # private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
+    def self.generate_key_pair(curve = Curves::P256)
       key = OpenSSL::PKey::EC.new(curve).generate_key
       public_key = key.public_key.to_bn.to_s(16).downcase
       [
