@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FlowClient
   class AccountKey
     attr_accessor :public_key,
