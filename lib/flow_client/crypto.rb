@@ -11,8 +11,9 @@ module FlowClient
     end
 
     # Sign data using the provided key
-    def self.sign(data, key)
-      asn = key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
+    def self.sign(data, private_key_hex)
+      ssl_key = FlowClient::Crypto.key_from_hex_keys(private_key_hex)
+      asn = ssl_key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
       r, s = OpenSSL::ASN1.decode(asn).value
       combined_bytes = Utils.left_pad_bytes([r.value.to_s(16)].pack("H*").unpack("C*"), 32) +
                        Utils.left_pad_bytes([s.value.to_s(16)].pack("H*").unpack("C*"), 32)
@@ -30,7 +31,7 @@ module FlowClient
       new_key.private_key = OpenSSL::BN.new(private_hex, 16)
       new_key.public_key = group.generator.mul(new_key.private_key)
       new_key
-    end
+    end  
 
     # Returns an octet string keypair.
     #
@@ -38,13 +39,17 @@ module FlowClient
     # Crypto::Curves::P256
     # Crypto::Curves::SECP256K1
     #
+    # The 04 prefix indicating that the public key is uncompressed is stripped.
+    # https://datatracker.ietf.org/doc/html/rfc5480
+    #
     # Usage example:
-    # private_key, public_key = FlowClient::Crypto.generate_keys(FlowClient::Crypto::Curves::P256)
-    def self.generate_keys(curve)
+    # private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
+    def self.generate_key_pair(curve = Curves::P256)
       key = OpenSSL::PKey::EC.new(curve).generate_key
+      public_key = key.public_key.to_bn.to_s(16).downcase
       [
         key.private_key.to_s(16).downcase,
-        key.public_key.to_bn.to_s(16).downcase
+        public_key[2..public_key.length]
       ]
     end
   end
