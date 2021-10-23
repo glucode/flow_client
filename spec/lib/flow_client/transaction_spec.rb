@@ -10,9 +10,7 @@ RSpec.describe FlowClient::Transaction do
   let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
   
   let(:service_account_private_key) do
-    FlowClient::Crypto.key_from_hex_keys(
-      "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-    )
+    "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
   end
 
   let(:script) do
@@ -106,11 +104,8 @@ RSpec.describe FlowClient::Transaction do
         payer_account = FlowClient::Account.new(address: service_account_address)
         new_account = client.create_account(pub_key_one, payer_account, signer)
 
-        new_account_key_one = FlowClient::Crypto.key_from_hex_keys(priv_key_one)
-        new_account_key_two = FlowClient::Crypto.key_from_hex_keys(priv_key_two)
-
-        signer = FlowClient::LocalSigner.new(new_account_key_one)
-        signer_two = FlowClient::LocalSigner.new(new_account_key_two)
+        signer = FlowClient::LocalSigner.new(priv_key_one)
+        signer_two = FlowClient::LocalSigner.new(priv_key_two)
         client.add_account_key(new_account.address, pub_key_two, new_account, signer)
 
         new_account = client.get_account(new_account.address)
@@ -142,9 +137,7 @@ RSpec.describe FlowClient::Transaction do
 
         service_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(
-          FlowClient::Crypto.key_from_hex_keys(
-            "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-          )
+          "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
         )
 
 
@@ -153,9 +146,7 @@ RSpec.describe FlowClient::Transaction do
         # Create a new account that will be executing the transaction
         new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
         authorizer_signer = FlowClient::LocalSigner.new(
-          FlowClient::Crypto.key_from_hex_keys(
-            authorizer_priv_key
-          )
+          authorizer_priv_key
         )
 
         transaction = FlowClient::Transaction.new
@@ -182,24 +173,16 @@ RSpec.describe FlowClient::Transaction do
 
         service_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(
-          FlowClient::Crypto.key_from_hex_keys(
-            "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-          )
-        )
-
-        service_account_private_key = FlowClient::Crypto.key_from_hex_keys(
           "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
         )
+
+        service_account_private_key = "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
 
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
 
         # Create a new account that will be executing the transaction
         new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
-        authorizer_signer = FlowClient::LocalSigner.new(
-          FlowClient::Crypto.key_from_hex_keys(
-            authorizer_priv_key
-          )
-        )
+        authorizer_signer = FlowClient::LocalSigner.new(authorizer_priv_key)
 
         transaction = FlowClient::Transaction.new
         transaction.script = script

@@ -11,8 +11,9 @@ module FlowClient
     end
 
     # Sign data using the provided key
-    def self.sign(data, key)
-      asn = key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
+    def self.sign(data, private_key_hex)
+      ssl_key = FlowClient::Crypto.key_from_hex_keys(private_key_hex)
+      asn = ssl_key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
       r, s = OpenSSL::ASN1.decode(asn).value
       combined_bytes = Utils.left_pad_bytes([r.value.to_s(16)].pack("H*").unpack("C*"), 32) +
                        Utils.left_pad_bytes([s.value.to_s(16)].pack("H*").unpack("C*"), 32)

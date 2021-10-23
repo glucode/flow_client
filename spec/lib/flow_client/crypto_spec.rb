@@ -39,7 +39,6 @@ RSpec.describe FlowClient::Transaction do
       _private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
       expect(public_key[0..1]).not_to eq('04')
       expect(public_key.length).to eq(128)
-      puts public_key
     end
   end
 end

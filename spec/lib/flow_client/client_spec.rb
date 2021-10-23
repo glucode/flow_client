@@ -4,9 +4,7 @@ RSpec.describe FlowClient::Transaction do
   let(:client) { FlowClient::Client.new("localhost:3569") }
   let(:service_account_address) { "f8d6e0586b0a20c7" }
   let(:service_account_private_key) {
-    FlowClient::Crypto.key_from_hex_keys(
-      "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-    )
+    "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
   }
 
   describe "ping" do
@@ -52,8 +50,7 @@ RSpec.describe FlowClient::Transaction do
         payer_account = FlowClient::Account.new(address: service_account_address)
         new_account = client.create_account(pub_key_one, payer_account, signer)
 
-        new_account_key = FlowClient::Crypto.key_from_hex_keys(priv_key_one)
-        signer = FlowClient::LocalSigner.new(new_account_key)
+        signer = FlowClient::LocalSigner.new(priv_key_one)
         client.add_account_key(new_account.address, pub_key_two, new_account, signer)
 
         expect(client.get_account(new_account.address).keys.count).to eq(2)
