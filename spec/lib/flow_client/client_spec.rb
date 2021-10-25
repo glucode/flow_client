@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe FlowClient::Transaction do
+  # TODO: Read these values from flow.json
   let(:client) { FlowClient::Client.new("localhost:3569") }
   let(:service_account_address) { "f8d6e0586b0a20c7" }
   let(:service_account_private_key) {
@@ -55,6 +56,61 @@ RSpec.describe FlowClient::Transaction do
 
         expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
+    end
+  end
+
+  context "blocks" do
+    describe "get_latest_block" do
+      before(:each) do
+        @res = client.get_latest_block
+      end
+
+      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
+      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.height).to be_an_instance_of(Integer) }
+      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+    end
+
+    describe "get_block_by_id" do
+      before(:each) do
+        latest_block = client.get_latest_block
+        @res = client.get_block_by_id(latest_block.block.id.unpack1("H*"))
+      end
+
+      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
+      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.height).to be_an_instance_of(Integer) }
+      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+    end
+
+    describe "get_block_by_height" do
+      before(:each) do
+        latest_block = client.get_latest_block
+        @res = client.get_block_by_height(latest_block.block.height)
+      end
+
+      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
+      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.block.height).to be_an_instance_of(Integer) }
+      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+    end
+  end
+
+  context "collections" do
+    describe "get_collection_by_id" do
+      before(:each) do
+        latest_block = client.get_latest_block
+        cid = latest_block.block.collection_guarantees.first.collection_id.unpack1("H*")
+        @res = client.get_collection_by_id(cid)
+        puts @res.inspect
+      end
+
+      it { expect(@res).not_to be(nil) }
+      it { expect(@res.collection.id.unpack1("H*")).to be_an_instance_of(String) }
+      it { expect(@res.collection.transaction_ids).to be_an_instance_of(Google::Protobuf::RepeatedField) }
     end
   end
 end
