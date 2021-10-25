@@ -6,23 +6,39 @@
 
 FlowClient is a Ruby gRPC client for Flow (onflow.org)
 
-#### Accounts
-- [x] Get account information
+#### Features
 
-#### Scripts
-- [x] Execute scripts
+Blocks:
+- [ ] retrieve a block by ID
+- [x] retrieve a block by height
+- [x] retrieve the latest block
 
-#### Transactions
-- [x] Send a transaction
-- [x] Get a transaction
-- [x] Single account signing
-- [ ] Multi account signing
-- [x] secp256k1 keys
-- [x] prime256v1 keys
+Collections:
+- [ ] retrieve a collection by ID 
 
-### Flow Data
-- [x] Get events
-- [x] Get block
+Events:
+- [x] retrieve events by name in the block height range
+
+Scripts:
+- [x] submit a script and parse the response
+- [x] submit a script with arguments
+- [x] create a script that returns complex structure and parse the response
+
+Accounts:
+- [x] retrieve an account by address
+- [x] create a new account
+- [ ] deploy a new contract to the account
+- [ ] remove a contract from the account
+- [ ] update an existing contract on the account
+
+Transactions: 
+- [x] retrieve a transaction by ID
+- [x] sign a transaction with same payer, proposer and authorizer
+- [x] sign a transaction with different payer and proposer
+- [x] sign a transaction with different authorizers using sign method multiple times
+- [x] submit a signed transaction
+- [x] sign a transaction with arguments and submit it
+
 
 ## Installation
 
