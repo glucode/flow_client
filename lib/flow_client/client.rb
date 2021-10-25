@@ -12,6 +12,12 @@ module FlowClient
     end
   end
 
+  class ClientError < StandardError
+    def initialize(message)
+      super(message)
+    end
+  end
+
   # Flow client
   class Client
     attr_accessor :address_aliases
@@ -31,23 +37,29 @@ module FlowClient
     # Gets account detail for address
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
-      res = @stub.get_account_at_latest_block(req)
 
-      account = FlowClient::Account.new
-      account.address = res.account.address.unpack1("H*")
-      account.balance = res.account.balance
-
-      res.account.keys.each do |key|
-        account.keys << FlowClient::AccountKey.new(
-          public_key: key.public_key.unpack1("H*"),
-          index: key.index,
-          sequence_number: key.sequence_number,
-          revoked: key.revoked,
-          weight: key.weight
+      begin
+        res = @stub.get_account_at_latest_block(req)
+      rescue GRPC::BadStatus => exception
+        raise ClientError.new(exception.details)
+      else
+        account = FlowClient::Account.new(
+          address: res.account.address.unpack1("H*"),
+          balance: res.account.balance
         )
+  
+        res.account.keys.each do |key|
+          account.keys << FlowClient::AccountKey.new(
+            public_key: key.public_key.unpack1("H*"),
+            index: key.index,
+            sequence_number: key.sequence_number,
+            revoked: key.revoked,
+            weight: key.weight
+          )
+        end
+  
+        account 
       end
-
-      account 
     end
 
     # Create a new account
@@ -135,8 +147,30 @@ module FlowClient
       req = Access::GetLatestBlockRequest.new(
         is_sealed: is_sealed
       )
-
       @stub.get_latest_block(req)
+    end
+
+    def get_block_by_id(id)
+      req = Access::GetBlockByIDRequest.new(
+        id: to_bytes(id)
+      )
+      @stub.get_block_by_id(req)
+    end
+
+    def get_block_by_height(height)
+      req = Access::GetBlockByHeightRequest.new(
+        height: height
+      )
+      @stub.get_block_by_height(req)
+    end
+
+    # Collections
+
+    def get_collection_by_id(id)
+      req = Access::GetCollectionByIDRequest.new(
+        id: to_bytes(id)
+      )
+      @stub.get_collection_by_id(req)
     end
 
     # Events
