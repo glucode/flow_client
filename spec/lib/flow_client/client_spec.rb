@@ -105,7 +105,6 @@ RSpec.describe FlowClient::Transaction do
         latest_block = client.get_latest_block
         cid = latest_block.block.collection_guarantees.first.collection_id.unpack1("H*")
         @res = client.get_collection_by_id(cid)
-        puts @res.inspect
       end
 
       it { expect(@res).not_to be(nil) }
