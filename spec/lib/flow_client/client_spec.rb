@@ -4,9 +4,9 @@ RSpec.describe FlowClient::Transaction do
   # TODO: Read these values from flow.json
   let(:client) { FlowClient::Client.new("localhost:3569") }
   let(:service_account_address) { "f8d6e0586b0a20c7" }
-  let(:service_account_private_key) {
+  let(:service_account_private_key) do
     "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-  }
+  end
 
   describe "ping" do
     it "pings the " do
@@ -45,7 +45,7 @@ RSpec.describe FlowClient::Transaction do
     describe "add_account_key" do
       it "adds the key to the account" do
         priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
-        priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+        _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
 
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
