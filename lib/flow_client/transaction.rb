@@ -48,11 +48,6 @@ module FlowClient
       ]
     end
 
-    def payload_message
-      payload = payload_canonical_form
-      RLP.encode(payload)
-    end
-
     def envelope_canonical_form
       signatures = []
       @payload_signatures.each_with_index do |sig, index|

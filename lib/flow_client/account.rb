@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FlowClient
+  # Represents a Flow account key.
   class AccountKey
     attr_accessor :public_key,
                   :index, :sequence_number,
@@ -16,6 +17,7 @@ module FlowClient
     end
   end
 
+  # Represents a Flow account.
   class Account
     attr_accessor :address, :balance, :keys
 

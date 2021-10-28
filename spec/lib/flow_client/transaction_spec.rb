@@ -62,7 +62,7 @@ RSpec.describe FlowClient::Transaction do
     end
   end
 
-  describe "envelope signatures" do
+  describe "signatures" do
     let(:padded_address) do
       FlowClient::Utils.left_pad_bytes([service_account_address].pack("H*").bytes, 8).pack("C*")
     end
@@ -193,10 +193,6 @@ RSpec.describe FlowClient::Transaction do
     end
   end
 
-  describe "payload signatures" do
-    it "adds a payload signature" do
-    end
-  end
 
   describe "to_protobuf_message" do
     let(:script) do
