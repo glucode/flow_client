@@ -17,12 +17,13 @@ module FlowClient
   end
 
   class Account
-    attr_accessor :address, :balance, :keys
+    attr_accessor :address, :balance, :keys, :contracts
 
-    def initialize(address: nil, balance: nil, keys: [])
+    def initialize(address: nil, balance: nil, keys: [], contracts: {})
       @keys = keys
       @address = address
       @balance = balance
+      @contracts = {}
     end
   end
 end

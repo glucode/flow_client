@@ -56,6 +56,32 @@ RSpec.describe FlowClient::Transaction do
 
         expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
+
+      describe "contracts" do
+        it "adds, updates and removes a contract" do
+          code = File.read(File.join("lib", "cadence", "contracts", "NonFungibleToken.cdc"))
+          
+          priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
+          _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+  
+          signer = FlowClient::LocalSigner.new(service_account_private_key)
+          account = FlowClient::Account.new(address: service_account_address)
+
+          client.remove_contract("NonFungibleToken", account, signer)
+
+          expect{
+            client.add_contract("NonFungibleToken", code, account, signer)
+          }.not_to raise_error
+
+          expect{
+            client.update_contract("NonFungibleToken", code, account, signer)
+          }.not_to raise_error
+
+          expect{
+            client.remove_contract("NonFungibleToken", account, signer)
+          }.not_to raise_error
+        end
+      end
     end
   end
 

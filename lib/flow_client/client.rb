@@ -52,6 +52,8 @@ module FlowClient
           )
         end
 
+        account.contracts = res.account.contracts
+
         account
       end
     end
@@ -106,6 +108,99 @@ module FlowClient
         {
           type: "String",
           value: public_key_hex
+        }.to_json
+      ]
+
+      transaction = FlowClient::Transaction.new
+      transaction.script = script
+      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.proposer_address = payer_account.address
+      transaction.proposer_key_index = 0
+      transaction.arguments = arguments
+      transaction.proposer_key_sequence_number = get_account(payer_account.address).keys.first.sequence_number
+      transaction.payer_address = payer_account.address
+      transaction.authorizer_addresses = [payer_account.address]
+      transaction.add_envelope_signature(payer_account.address, 0, signer)
+      res = send_transaction(transaction)
+
+      wait_for_transaction(res.id.unpack1("H*")) do |response|
+        raise CadenceRuntimeError, response.error_message if response.status_code != 0
+      end
+    end
+
+    # Contracts
+
+    def add_contract(name, code, payer_account, signer)
+      script = File.read(File.join("lib", "cadence", "templates", "add-contract.cdc"))
+      code_hex = code.unpack1("H*")
+
+      arguments = [
+        {
+          type: "String",
+          value: name
+        }.to_json,
+        {
+          type: "String",
+          value: code_hex
+        }.to_json
+      ]
+
+      transaction = FlowClient::Transaction.new
+      transaction.script = script
+      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.proposer_address = payer_account.address
+      transaction.proposer_key_index = 0
+      transaction.arguments = arguments
+      transaction.proposer_key_sequence_number = get_account(payer_account.address).keys.first.sequence_number
+      transaction.payer_address = payer_account.address
+      transaction.authorizer_addresses = [payer_account.address]
+      transaction.add_envelope_signature(payer_account.address, 0, signer)
+      res = send_transaction(transaction)
+
+      wait_for_transaction(res.id.unpack1("H*")) do |response|
+        raise CadenceRuntimeError, response.error_message if response.status_code != 0
+      end
+    end
+
+    def remove_contract(name, payer_account, signer)
+      script = File.read(File.join("lib", "cadence", "templates", "remove-contract.cdc"))
+
+      arguments = [
+        {
+          type: "String",
+          value: name
+        }.to_json
+      ]
+
+      transaction = FlowClient::Transaction.new
+      transaction.script = script
+      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.proposer_address = payer_account.address
+      transaction.proposer_key_index = 0
+      transaction.arguments = arguments
+      transaction.proposer_key_sequence_number = get_account(payer_account.address).keys.first.sequence_number
+      transaction.payer_address = payer_account.address
+      transaction.authorizer_addresses = [payer_account.address]
+      transaction.add_envelope_signature(payer_account.address, 0, signer)
+      res = send_transaction(transaction)
+
+      wait_for_transaction(res.id.unpack1("H*")) do |response|
+        raise CadenceRuntimeError, response.error_message if response.status_code != 0
+      end
+    end
+
+    def update_contract(name, code, payer_account, signer)
+      script = File.read(File.join("lib", "cadence", "templates", "update-contract.cdc"))
+      code_hex = code.unpack1("H*")
+
+      arguments = [
+        {
+          type: "String",
+          value: name
+        }.to_json,
+        {
+          type: "String",
+          value: code_hex
         }.to_json
       ]
 
