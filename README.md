@@ -63,11 +63,34 @@ Or install it yourself as:
 client = FlowClient::Client.new("access.devnet.nodes.onflow.org:9000")
 res = client.ping
 ```
-### Accounts
+
+### Blocks
+
+#### Retrieve a block by ID
+```ruby
+latest_block = client.get_latest_block
+res = client.get_block_by_id(latest_block.block.id.unpack1("H*"))
+```
+
+#### Retrieve a block by height
+```ruby
+latest_block = client.get_latest_block
+res = client.get_block_by_height(latest_block.block.height)
+```
+
+#### Retrieve the latest block
+```ruby
+latest_block = client.get_latest_block
+```
+
+### Collections
+
+#### Retrieve a collection by ID
 
 ```ruby
-# get_account(account_address)
-res = client.get_account("0xAlice")
+latest_block = client.get_latest_block
+cid = latest_block.block.collection_guarantees.first.collection_id.unpack1("H*")
+res = client.get_collection_by_id(cid)
 ```
 
 ### Events
@@ -86,52 +109,160 @@ args = [{ type: "Address", value: "0xAlice" }.to_json]
 res = client.execute_script(script, args)
 ```
 
+### Accounts
+
+#### Create account
+```ruby
+# get_account(account_address)
+res = client.get_account("0xAlice")
+```
+
+#### Get account
+```ruby
+# get_account(account_address)
+res = client.get_account("0xAlice")
+```
+
+#### Add contract
+```ruby
+contract_code = "..."
+signer = FlowClient::LocalSigner.new(service_account_private_key)
+payer = FlowClient::Account.new(address: service_account_address)
+client.add_contract("ContractName", contract_code, payer, signer)
+```
+
+#### Update contract
+```ruby
+contract_code = "..."
+signer = FlowClient::LocalSigner.new(service_account_private_key)
+payer = FlowClient::Account.new(address: service_account_address)
+client.update_contract("ContractName", contract_code, payer, signer)
+```
+
+#### Remove contract
+```ruby
+signer = FlowClient::LocalSigner.new(service_account_private_key)
+payer = FlowClient::Account.new(address: service_account_address)
+client.remove_contract("ContractName", payer, signer)
+```
+
 ### Transactions
 
+#### Get transaction result
+
 ```ruby
-key = FlowClient::Crypto.key_from_hex_keys(
-  "<priv key hex>"
-)
-
-# Send a transaction with a single signer, proposer and authorizer
-transaction = FlowClient::Transaction.new
-transaction.script = cadence
-transaction.reference_block_id = ref_block_id
-transaction.proposer_address = "0xAlice"
-transaction.proposer_key_index = 0
-transaction.arguments = [
-  { type: "Address", value: user_address }.to_json
-]
-transaction.proposer_key_sequence_number = sequence_number
-transaction.payer_address = "0xAlice"
-transaction.authorizer_addresses = ["0xAlice"]
-transaction.add_envelope_signature("0xAlice", 0, key)
-res = client.send_transaction(transaction)
-
-# Get a transaction
-# get_transaction(transaction_id)
-client.get_transaction(res.id.unpack("H*"))
-
 # Get a transaction result
 # get_transaction_result(transaction_id)
 client.get_transaction_result(res.id.unpack("H*"))
 ```
 
-### Address Alias Resolution
-
-Using address aliases is handy for switching between different environments.
+#### Single signer, proposer and authorizer
 
 ```ruby
-cadence =  %{
-    import FungibleToken from 0xFungibleToken
-    
-    ...
-}
+service_account_address = "f8d6e0586b0a20c7"
+service_account_key = client.get_account(service_account_address).keys.first
 
-client.address_aliases = { "0xFungibleToken": "0x123234545" }
+arguments = [{ type: "String", value: "Hello world!" }.to_json]
 
-# 0xFungibleToken get resolved to the address "0x123234545"
-res = client.execute_script(cadence)
+transaction = FlowClient::Transaction.new
+transaction.script = script
+transaction.reference_block_id = reference_block_id
+transaction.gas_limit = 100
+transaction.proposer_address = service_account_address
+transaction.proposer_key_index = service_account_key.index
+transaction.arguments = arguments
+transaction.proposer_key_sequence_number = service_account_key.sequence_number
+transaction.payer_address = service_account_address
+transaction.authorizer_addresses = [service_account_address]
+
+# Only the envelope needs to be signed in this special case
+signer = FlowClient::LocalSigner.new(service_account_private_key)
+transaction.add_envelope_signature(service_account_address, 0, signer)
+
+tx = client.send_transaction(transaction)
+client.wait_for_transaction(tx.id.unpack1("H*")) do |result|
+  puts result.inspect
+end
+```
+
+#### Sign a transaction with different payer and proposer
+
+```ruby
+service_account_address = "f8d6e0586b0a20c7"
+service_account_key = client.get_account(service_account_address).keys.first
+
+service_account = client.get_account(service_account_address)
+payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
+
+# Create a new account that will be executing the transaction
+authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
+new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
+authorizer_signer = FlowClient::LocalSigner.new(
+  authorizer_priv_key
+)
+
+arguments = [{ type: "String", value: "Hello world!" }.to_json]
+
+transaction = FlowClient::Transaction.new
+transaction.script = script
+transaction.reference_block_id = reference_block_id
+transaction.gas_limit = 100
+transaction.proposer_address = service_account_address
+transaction.proposer_key_index = service_account_key.index
+transaction.arguments = arguments
+transaction.proposer_key_sequence_number = service_account_key.sequence_number
+transaction.payer_address = service_account_address
+transaction.authorizer_addresses = [service_account_address]
+
+# The authorizer signs the payload
+transaction.add_payload_signature(new_account.address, new_account.keys.first.index, authorizer_signer)
+
+# The payer signs the envelope
+transaction.add_envelope_signature(service_account_address, service_account.keys.first.index, payer_signer)
+
+tx = client.send_transaction(transaction)
+client.wait_for_transaction(tx.id.unpack1("H*")) do |result|
+  puts result.inspect
+end
+```
+
+#### Sign a transaction with different authorizers using sign method multiple times
+
+```ruby
+service_account_address = "f8d6e0586b0a20c7"
+service_account_key = client.get_account(service_account_address).keys.first
+
+arguments = [{ type: "String", value: "Hello world!" }.to_json]
+
+priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
+priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+
+payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
+payer_account = FlowClient::Account.new(address: service_account_address)
+new_account = client.create_account(pub_key_one, payer_account, payer_signer)
+
+auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
+auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
+client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one)
+
+new_account = client.get_account(new_account.address)
+
+@transaction = FlowClient::Transaction.new
+@transaction.script = script
+@transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+@transaction.gas_limit = gas_limit
+@transaction.proposer_address = new_account.address
+@transaction.proposer_key_index = new_account.keys[0].index
+@transaction.arguments = arguments
+@transaction.proposer_key_sequence_number = new_account.keys[0].sequence_number
+@transaction.payer_address = new_account.address
+@transaction.authorizer_addresses = [new_account.address]
+@transaction.add_envelope_signature(new_account.address, new_account.keys[0].index, auth_signer_one)
+@transaction.add_envelope_signature(new_account.address, new_account.keys[1].index, auth_signer_two)
+tx_res = client.send_transaction(@transaction)
+client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+  expect(response.status_code).to eq(0)
+end
 ```
 
 ## Development
