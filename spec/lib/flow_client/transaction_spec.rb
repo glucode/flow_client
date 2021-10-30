@@ -99,13 +99,13 @@ RSpec.describe FlowClient::Transaction do
         priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
         priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
 
-        signer = FlowClient::LocalSigner.new(service_account_private_key)
+        payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
-        new_account = client.create_account(pub_key_one, payer_account, signer)
+        new_account = client.create_account(pub_key_one, payer_account, payer_signer)
 
-        signer = FlowClient::LocalSigner.new(priv_key_one)
-        signer_two = FlowClient::LocalSigner.new(priv_key_two)
-        client.add_account_key(new_account.address, pub_key_two, new_account, signer)
+        auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
+        auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
+        client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one)
 
         new_account = client.get_account(new_account.address)
 
@@ -121,8 +121,8 @@ RSpec.describe FlowClient::Transaction do
         @transaction.proposer_key_sequence_number = new_account.keys[0].sequence_number
         @transaction.payer_address = new_account.address
         @transaction.authorizer_addresses = [new_account.address]
-        @transaction.add_envelope_signature(new_account.address, new_account.keys[0].index, signer)
-        @transaction.add_envelope_signature(new_account.address, new_account.keys[1].index, signer_two)
+        @transaction.add_envelope_signature(new_account.address, new_account.keys[0].index, auth_signer_one)
+        @transaction.add_envelope_signature(new_account.address, new_account.keys[1].index, auth_signer_two)
         tx_res = client.send_transaction(@transaction)
         client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
           expect(response.status_code).to eq(0)
@@ -163,38 +163,44 @@ RSpec.describe FlowClient::Transaction do
       end
 
       it "successfully signs with multiple signatures" do
-        authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
+        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
+        priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+        priv_key_three, pub_key_three = FlowClient::Crypto.generate_key_pair
 
-        service_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
+        payer_account = client.get_account( service_account_address)
+        new_account = client.create_account(pub_key_one, payer_account, payer_signer)
 
-        # Create a new account that will be executing the transaction
-        new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
-        authorizer_signer = FlowClient::LocalSigner.new(authorizer_priv_key)
+        auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
+        auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
+        client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one)
 
-        transaction = FlowClient::Transaction.new
-        transaction.script = script
-        transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
-        transaction.proposer_address = new_account.address
-        transaction.proposer_key_index = new_account.keys.first.index
-        transaction.arguments = arguments
-        transaction.proposer_key_sequence_number = new_account.keys.first.sequence_number
-        transaction.authorizer_addresses = [new_account.address]
-        transaction.payer_address = service_account_address
-        transaction.add_payload_signature(new_account.address, new_account.keys.first.index, authorizer_signer)
-        transaction.add_envelope_signature(service_account_address, service_account.keys.first.index, payer_signer)
+        new_account = client.get_account(new_account.address)
 
-        res = client.send_transaction(transaction)
+        expect(client.get_account(new_account.address).keys.count).to eq(2)
 
-        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
-          expect(response.status_code).to be(0)
+        @transaction = FlowClient::Transaction.new
+        @transaction.script = script
+        @transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+        @transaction.gas_limit = gas_limit
+        @transaction.arguments = arguments
+
+        @transaction.proposer_address = new_account.address
+        @transaction.proposer_key_index = new_account.keys[1].index
+        @transaction.proposer_key_sequence_number = new_account.keys[1].sequence_number
+
+        @transaction.payer_address = payer_account.address
+        @transaction.authorizer_addresses = [new_account.address]
+
+        @transaction.add_payload_signature(new_account.address, new_account.keys[0].index, auth_signer_one)
+        @transaction.add_payload_signature(new_account.address, new_account.keys[1].index, auth_signer_two)
+
+        @transaction.add_envelope_signature(payer_account.address, payer_account.keys[0].index, payer_signer)
+        tx_res = client.send_transaction(@transaction)
+        client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+          expect(response.status_code).to eq(0)
         end
       end
-    end
-  end
-
-  describe "payload signatures" do
-    it "adds a payload signature" do
     end
   end
 
