@@ -9,12 +9,12 @@ FlowClient is a Ruby gRPC client for Flow (onflow.org)
 #### Features
 
 Blocks:
-- [ ] retrieve a block by ID
+- [x] retrieve a block by ID
 - [x] retrieve a block by height
 - [x] retrieve the latest block
 
 Collections:
-- [ ] retrieve a collection by ID 
+- [x] retrieve a collection by ID 
 
 Events:
 - [x] retrieve events by name in the block height range
