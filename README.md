@@ -27,9 +27,9 @@ Scripts:
 Accounts:
 - [x] retrieve an account by address
 - [x] create a new account
-- [ ] deploy a new contract to the account
-- [ ] remove a contract from the account
-- [ ] update an existing contract on the account
+- [x] deploy a new contract to the account
+- [x] remove a contract from the account
+- [x] update an existing contract on the account
 
 Transactions: 
 - [x] retrieve a transaction by ID
