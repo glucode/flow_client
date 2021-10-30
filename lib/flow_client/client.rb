@@ -7,9 +7,9 @@ require "json"
 # Collection of classes to interact with the Flow blockchain
 module FlowClient
   class CadenceRuntimeError < StandardError
-    def initialize(message)
-      super(message)
-    end
+  end
+
+  class ClientError < StandardError
   end
 
   # Flow client
@@ -31,23 +31,29 @@ module FlowClient
     # Gets account detail for address
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
-      res = @stub.get_account_at_latest_block(req)
 
-      account = FlowClient::Account.new
-      account.address = res.account.address.unpack1("H*")
-      account.balance = res.account.balance
-
-      res.account.keys.each do |key|
-        account.keys << FlowClient::AccountKey.new(
-          public_key: key.public_key.unpack1("H*"),
-          index: key.index,
-          sequence_number: key.sequence_number,
-          revoked: key.revoked,
-          weight: key.weight
+      begin
+        res = @stub.get_account_at_latest_block(req)
+      rescue GRPC::BadStatus => e
+        raise ClientError, e.details
+      else
+        account = FlowClient::Account.new(
+          address: res.account.address.unpack1("H*"),
+          balance: res.account.balance
         )
-      end
 
-      account 
+        res.account.keys.each do |key|
+          account.keys << FlowClient::AccountKey.new(
+            public_key: key.public_key.unpack1("H*"),
+            index: key.index,
+            sequence_number: key.sequence_number,
+            revoked: key.revoked,
+            weight: key.weight
+          )
+        end
+
+        account
+      end
     end
 
     # Create a new account
@@ -63,14 +69,13 @@ module FlowClient
         }.to_json,
         {
           type: "Dictionary",
-          value: [
-          ]
+          value: []
         }.to_json
       ]
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block().block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -82,8 +87,9 @@ module FlowClient
 
       new_account = nil
       wait_for_transaction(res.id.unpack1("H*")) do |response|
-        raise CadenceRuntimeError.new(response.error_message) if response.status_code != 0
-        event_payload = response.events.select{ |e| e.type == 'flow.AccountCreated' }.first.payload
+        raise CadenceRuntimeError, response.error_message if response.status_code != 0
+
+        event_payload = response.events.select { |e| e.type == "flow.AccountCreated" }.first.payload
         payload_json = JSON.parse(event_payload)
         new_account_address = payload_json["value"]["fields"][0]["value"]["value"]
         new_account = get_account(new_account_address)
@@ -93,7 +99,7 @@ module FlowClient
     end
 
     # Add account key
-    def add_account_key(address, public_key_hex, payer_account, signer)
+    def add_account_key(_address, public_key_hex, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "add-account-key.cdc"))
 
       arguments = [
@@ -105,7 +111,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block().block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -116,7 +122,7 @@ module FlowClient
       res = send_transaction(transaction)
 
       wait_for_transaction(res.id.unpack1("H*")) do |response|
-        raise CadenceRuntimeError.new(response.error_message) if response.status_code != 0
+        raise CadenceRuntimeError, response.error_message if response.status_code != 0
       end
     end
 
@@ -135,8 +141,30 @@ module FlowClient
       req = Access::GetLatestBlockRequest.new(
         is_sealed: is_sealed
       )
-
       @stub.get_latest_block(req)
+    end
+
+    def get_block_by_id(id)
+      req = Access::GetBlockByIDRequest.new(
+        id: to_bytes(id)
+      )
+      @stub.get_block_by_id(req)
+    end
+
+    def get_block_by_height(height)
+      req = Access::GetBlockByHeightRequest.new(
+        height: height
+      )
+      @stub.get_block_by_height(req)
+    end
+
+    # Collections
+
+    def get_collection_by_id(id)
+      req = Access::GetCollectionByIDRequest.new(
+        id: to_bytes(id)
+      )
+      @stub.get_collection_by_id(req)
     end
 
     # Events

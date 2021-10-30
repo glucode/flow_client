@@ -5,10 +5,10 @@ require "rlp"
 RSpec.describe FlowClient::Transaction do
   let(:service_account_address) { "f8d6e0586b0a20c7" }
   let(:client) { FlowClient::Client.new("localhost:3569") }
-  let(:reference_block_id) {  client.get_latest_block().block.id.unpack1("H*") }
+  let(:reference_block_id) { client.get_latest_block.block.id.unpack1("H*") }
   let(:gas_limit) { 100 }
   let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
-  
+
   let(:service_account_private_key) do
     "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
   end
@@ -63,7 +63,6 @@ RSpec.describe FlowClient::Transaction do
   end
 
   describe "envelope signatures" do
-
     let(:padded_address) do
       FlowClient::Utils.left_pad_bytes([service_account_address].pack("H*").bytes, 8).pack("C*")
     end
@@ -114,7 +113,7 @@ RSpec.describe FlowClient::Transaction do
 
         @transaction = FlowClient::Transaction.new
         @transaction.script = script
-        @transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        @transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
         @transaction.gas_limit = gas_limit
         @transaction.proposer_address = new_account.address
         @transaction.proposer_key_index = new_account.keys[0].index
@@ -136,11 +135,6 @@ RSpec.describe FlowClient::Transaction do
         authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
 
         service_account = client.get_account(service_account_address)
-        payer_signer = FlowClient::LocalSigner.new(
-          "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-        )
-
-
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
 
         # Create a new account that will be executing the transaction
@@ -151,7 +145,7 @@ RSpec.describe FlowClient::Transaction do
 
         transaction = FlowClient::Transaction.new
         transaction.script = script
-        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
         transaction.proposer_address = new_account.address
         transaction.proposer_key_index = new_account.keys.first.index
         transaction.arguments = arguments
@@ -160,7 +154,7 @@ RSpec.describe FlowClient::Transaction do
         transaction.payer_address = service_account_address
         transaction.add_payload_signature(new_account.address, new_account.keys.first.index, authorizer_signer)
         transaction.add_envelope_signature(service_account_address, service_account.keys.first.index, payer_signer)
-        
+
         res = client.send_transaction(transaction)
 
         client.wait_for_transaction(res.id.unpack1("H*")) do |response|
@@ -172,12 +166,6 @@ RSpec.describe FlowClient::Transaction do
         authorizer_priv_key, authorizer_pub_key = FlowClient::Crypto.generate_key_pair
 
         service_account = client.get_account(service_account_address)
-        payer_signer = FlowClient::LocalSigner.new(
-          "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-        )
-
-        service_account_private_key = "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
-
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
 
         # Create a new account that will be executing the transaction
@@ -186,7 +174,7 @@ RSpec.describe FlowClient::Transaction do
 
         transaction = FlowClient::Transaction.new
         transaction.script = script
-        transaction.reference_block_id = client.get_latest_block().block.id.unpack1("H*")
+        transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
         transaction.proposer_address = new_account.address
         transaction.proposer_key_index = new_account.keys.first.index
         transaction.arguments = arguments
@@ -195,7 +183,7 @@ RSpec.describe FlowClient::Transaction do
         transaction.payer_address = service_account_address
         transaction.add_payload_signature(new_account.address, new_account.keys.first.index, authorizer_signer)
         transaction.add_envelope_signature(service_account_address, service_account.keys.first.index, payer_signer)
-        
+
         res = client.send_transaction(transaction)
 
         client.wait_for_transaction(res.id.unpack1("H*")) do |response|
@@ -207,7 +195,6 @@ RSpec.describe FlowClient::Transaction do
 
   describe "payload signatures" do
     it "adds a payload signature" do
-
     end
   end
 
