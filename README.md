@@ -243,7 +243,7 @@ new_account = client.create_account(pub_key_one, payer_account, payer_signer)
 
 auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
 auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
-client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one)
+client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one, 1000.0)
 
 new_account = client.get_account(new_account.address)
 
