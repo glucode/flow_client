@@ -1,5 +1,4 @@
 [![Gem Version](https://badge.fury.io/rb/flow_client.svg)](https://badge.fury.io/rb/flow_client)
-![Rubocop Analysis](https://github.com/glucode/flow_client/actions/workflows/rubocop-analysis.yml/badge.svg)
 ![RSpec Tests](https://github.com/glucode/flow_client/actions/workflows/ruby.yml/badge.svg)
 
 # FlowClient
@@ -263,6 +262,15 @@ tx_res = client.send_transaction(@transaction)
 client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
   expect(response.status_code).to eq(0)
 end
+```
+
+## Tests
+
+Running the tests require the emulator to be started.
+
+```
+docker-compose up
+bundle exec rspec
 ```
 
 ## Development
