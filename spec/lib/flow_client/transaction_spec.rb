@@ -164,9 +164,9 @@ RSpec.describe FlowClient::Transaction do
 
       it "successfully signs with multi party, two authorizers" do
         script = %{
-          transaction { 
-            prepare(signer1: AuthAccount, signer2: AuthAccount) { 
-              log(signer1.address) 
+          transaction {
+            prepare(signer1: AuthAccount, signer2: AuthAccount) {
+              log(signer1.address)
               log(signer2.address)
             }
           }
@@ -206,7 +206,7 @@ RSpec.describe FlowClient::Transaction do
 
       it "successfully signs with multiple signatures" do
         script = %{
-          transaction { 
+          transaction {
             prepare(signer: AuthAccount) { log(signer.address) }
           }
         }

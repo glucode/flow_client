@@ -58,12 +58,12 @@ module FlowClient
     def envelope_canonical_form
       @signers[@proposer_address] = 0
 
-      @payload_signatures.each_with_index do |sig, index|
+      @payload_signatures.each do |sig|
         @signers[sig.address] = @signers.keys.count
       end
 
       signatures = []
-      @payload_signatures.each_with_index do |sig, index|
+      @payload_signatures.each do |sig|
         signatures << [
           @signers[sig.address.unpack1("H*")],
           sig.key_id,
