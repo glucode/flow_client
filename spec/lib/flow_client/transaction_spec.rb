@@ -220,6 +220,7 @@ RSpec.describe FlowClient::Transaction do
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_signer_two = FlowClient::LocalSigner.new(payer_priv_key_two)
         client.add_account_key(payer_account.address, payer_pub_key_two, payer_account, payer_signer, 500.0)
+        payer_account = client.get_account(payer_account.address)
 
         # Create a new account
         new_account = client.create_account(pub_key_one, payer_account, payer_signer)
@@ -252,7 +253,8 @@ RSpec.describe FlowClient::Transaction do
         @transaction.add_payload_signature(new_account.address, new_account.keys[1].index, auth_signer_two)
         @transaction.add_payload_signature(new_account.address, new_account.keys[2].index, auth_signer_three)
 
-        @transaction.add_envelope_signature(payer_account.address, payer_account.keys[0].index, payer_signer)
+        @transaction.add_envelope_signature(payer_account.address, payer_account.keys.first.index, payer_signer)
+        @transaction.add_envelope_signature(payer_account.address, payer_account.keys.last.index, payer_signer_two)
 
         tx_res = client.send_transaction(@transaction)
         client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|

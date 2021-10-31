@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlowClient::Transaction do
+RSpec.describe FlowClient::Client do
   # TODO: Read these values from flow.json
   let(:client) { FlowClient::Client.new("localhost:3569") }
   let(:service_account_address) { "f8d6e0586b0a20c7" }
@@ -115,6 +115,7 @@ RSpec.describe FlowClient::Transaction do
       before(:each) do
         latest_block = client.get_latest_block
         @res = client.get_block_by_height(latest_block.block.height)
+        puts @res.inspect
       end
 
       it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
