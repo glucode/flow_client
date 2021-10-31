@@ -1,4 +1,4 @@
-transaction(publicKey: String) {
+transaction(publicKey: String, weight: UFix64) {
 	prepare(signer: AuthAccount) {
 		// signer.addPublicKey(publicKey.decodeHex())
 
@@ -10,7 +10,7 @@ transaction(publicKey: String) {
 		signer.keys.add(
 			publicKey: key,
 			hashAlgorithm: HashAlgorithm.SHA3_256,
-			weight: 1000.0
+			weight: weight
 		)
 	}
 }

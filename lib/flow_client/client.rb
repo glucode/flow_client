@@ -101,13 +101,17 @@ module FlowClient
     end
 
     # Add account key
-    def add_account_key(_address, public_key_hex, payer_account, signer)
+    def add_account_key(_address, public_key_hex, payer_account, signer, weight)
       script = File.read(File.join("lib", "cadence", "templates", "add-account-key.cdc"))
 
       arguments = [
         {
           type: "String",
           value: public_key_hex
+        }.to_json,
+        {
+          type: "UFix64",
+          value: weight.to_s
         }.to_json
       ]
 
