@@ -29,9 +29,11 @@ module FlowClient
       @gas_limit = 0
       @envelope_signatures = []
       @payload_signatures = []
+      @proposer_address = nil
       @proposer_key_index = 0
       @proposer_key_sequence_number = 0
       @address_aliases = {}
+      @signers = {}
     end
 
     def self.padded_transaction_domain_tag
@@ -54,10 +56,16 @@ module FlowClient
     end
 
     def envelope_canonical_form
+      @signers[@proposer_address] = 0
+
+      @payload_signatures.each_with_index do |sig, index|
+        @signers[sig.address] = @signers.keys.count
+      end
+
       signatures = []
       @payload_signatures.each_with_index do |sig, index|
         signatures << [
-          index,
+          @signers[sig.address.unpack1("H*")],
           sig.key_id,
           sig.signature
         ]

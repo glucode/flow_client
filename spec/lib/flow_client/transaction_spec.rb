@@ -215,9 +215,11 @@ RSpec.describe FlowClient::Transaction do
         priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
         priv_key_three, pub_key_three = FlowClient::Crypto.generate_key_pair
 
+        payer_priv_key_two, payer_pub_key_two = FlowClient::Crypto.generate_key_pair
         payer_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
-        payer_priv_key_two, payer_pub_key_two = FlowClient::Crypto.generate_key_pair
+        payer_signer_two = FlowClient::LocalSigner.new(payer_priv_key_two)
+        client.add_account_key(payer_account.address, payer_pub_key_two, payer_account, payer_signer, 500.0)
 
         # Create a new account
         new_account = client.create_account(pub_key_one, payer_account, payer_signer)
