@@ -18,7 +18,10 @@ module FlowClient
                   :proposer_key_sequence_number,
                   :payer_address,
                   :authorizer_addresses,
-                  :address_aliases
+                  :address_aliases,
+                  :envelope_signatures,
+                  :payload_signatures,
+                  :proposal_key
 
     attr_reader :envelope_signatures, :payload_signatures
 
@@ -34,6 +37,7 @@ module FlowClient
       @proposer_key_sequence_number = 0
       @address_aliases = {}
       @signers = {}
+      @proposal_key = nil
     end
 
     def self.padded_transaction_domain_tag
@@ -120,6 +124,20 @@ module FlowClient
                                 envelope_signatures: @envelope_signatures)
     end
 
+    def self.parse_grpc_type(type)
+      tx = Transaction.new
+      tx.script = type.script
+      tx.arguments = type.arguments
+      tx.reference_block_id = type.reference_block_id.unpack1("H*")
+      tx.gas_limit = type.gas_limit
+      tx.authorizer_addresses = type.authorizers.map { |address| address.unpack1("H*") }
+      tx.envelope_signatures = type.envelope_signatures.map { |sig| Signature.parse_grpc_type(sig) }
+      tx.payload_signatures = type.payload_signatures.map { |sig| Signature.parse_grpc_type(sig) }
+      tx.proposal_key = ProposalKey.parse_grpc_type(type.proposal_key)
+      tx.payer_address = type.payer.unpack1("H*")
+      tx
+    end
+
     protected
 
     def resolved_script
@@ -130,4 +148,6 @@ module FlowClient
       Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")
     end
   end
+
+
 end

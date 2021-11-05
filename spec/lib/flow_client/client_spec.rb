@@ -52,7 +52,7 @@ RSpec.describe FlowClient::Client do
         new_account = client.create_account(pub_key_one, payer_account, signer)
 
         signer = FlowClient::LocalSigner.new(priv_key_one)
-        client.add_account_key(new_account.address, pub_key_two, new_account, signer, 1000.0)
+        client.add_account_key(pub_key_two, new_account, signer, 1000.0)
 
         expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
@@ -88,41 +88,40 @@ RSpec.describe FlowClient::Client do
   context "blocks" do
     describe "get_latest_block" do
       before(:each) do
-        @res = client.get_latest_block
+        @block = client.get_latest_block
       end
 
-      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
-      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.height).to be_an_instance_of(Integer) }
-      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+      it { expect(@block).to be_an_instance_of(FlowClient::Block) }
+      it { expect(@block.id).to be_an_instance_of(String) }
+      it { expect(@block.parent_id).to be_an_instance_of(String) }
+      it { expect(@block.height).to be_an_instance_of(Integer) }
+      it { expect(@block.collection_guarantees).to be_an_instance_of(Array) }
     end
 
     describe "get_block_by_id" do
       before(:each) do
         latest_block = client.get_latest_block
-        @res = client.get_block_by_id(latest_block.block.id.unpack1("H*"))
+        @block = client.get_block_by_id(latest_block.id)
       end
 
-      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
-      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.height).to be_an_instance_of(Integer) }
-      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+      it { expect(@block).to be_an_instance_of(FlowClient::Block) }
+      it { expect(@block.id).to be_an_instance_of(String) }
+      it { expect(@block.parent_id).to be_an_instance_of(String) }
+      it { expect(@block.height).to be_an_instance_of(Integer) }
+      it { expect(@block.collection_guarantees).to be_an_instance_of(Array) }
     end
 
     describe "get_block_by_height" do
       before(:each) do
         latest_block = client.get_latest_block
-        @res = client.get_block_by_height(latest_block.block.height)
-        puts @res.inspect
+        @block = client.get_block_by_height(latest_block.height)
       end
 
-      it { expect(@res).to be_an_instance_of(Access::BlockResponse) }
-      it { expect(@res.block.id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.parent_id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.block.height).to be_an_instance_of(Integer) }
-      it { expect(@res.block.collection_guarantees).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+      it { expect(@block).to be_an_instance_of(FlowClient::Block) }
+      it { expect(@block.id).to be_an_instance_of(String) }
+      it { expect(@block.parent_id).to be_an_instance_of(String) }
+      it { expect(@block.height).to be_an_instance_of(Integer) }
+      it { expect(@block.collection_guarantees).to be_an_instance_of(Array) }
     end
   end
 
@@ -130,13 +129,31 @@ RSpec.describe FlowClient::Client do
     describe "get_collection_by_id" do
       before(:each) do
         latest_block = client.get_latest_block
-        cid = latest_block.block.collection_guarantees.first.collection_id.unpack1("H*")
-        @res = client.get_collection_by_id(cid)
+        cid = latest_block.collection_guarantees.first.collection_id
+        @collection = client.get_collection_by_id(cid)
       end
 
-      it { expect(@res).not_to be(nil) }
-      it { expect(@res.collection.id.unpack1("H*")).to be_an_instance_of(String) }
-      it { expect(@res.collection.transaction_ids).to be_an_instance_of(Google::Protobuf::RepeatedField) }
+      it { expect(@collection).to be_an_instance_of(FlowClient::Collection) }
+      it { expect(@collection).not_to be(nil) }
+      it { expect(@collection.id).to be_an_instance_of(String) }
+      it { expect(@collection.transaction_ids).to be_an_instance_of(Array) }
+    end
+  end
+
+  context "script" do
+    it "sends a simple script" do
+      
+      script = %{
+        pub fun main(a: Int): Int {
+          return a + 10
+        }
+      }
+      
+      args = [{ type: 'Int', value: "1" }.to_json]
+      res = client.execute_script(script, args)
+
+      expect(res.type).to eq("Int")
+      expect(res.value).to eq("11")
     end
   end
 end

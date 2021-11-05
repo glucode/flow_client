@@ -39,5 +39,10 @@ module FlowClient
     def self.strip_address_prefix(address)
       address[0..1]
     end
+
+    def self.parse_protobuf_timestamp(timestamp)
+      epoch_micros = timestamp.nanos / 10 ** 6
+      Time.at(timestamp.seconds, epoch_micros)
+    end
   end
 end

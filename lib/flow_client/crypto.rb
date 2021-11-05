@@ -10,9 +10,15 @@ module FlowClient
       SECP256K1 = "secp256k1"
     end
 
+    module HashAlgos
+      SHA2_256 = "SHA2-256"
+      SHA3_256 = "SHA3-256"
+    end
+
     # Sign data using the provided key
-    def self.sign(data, private_key_hex)
+    def self.sign(data, private_key_hex, hash_algo = HashAlgos::SHA3_256)
       ssl_key = FlowClient::Crypto.key_from_hex_keys(private_key_hex)
+      # TODO: Fix this so that both hashing algos will work
       asn = ssl_key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
       r, s = OpenSSL::ASN1.decode(asn).value
       combined_bytes = Utils.left_pad_bytes([r.value.to_s(16)].pack("H*").unpack("C*"), 32) +
@@ -25,8 +31,8 @@ module FlowClient
     #
     # secp256k1
     # prime256v1
-    def self.key_from_hex_keys(private_hex, algo = Curves::P256)
-      group = OpenSSL::PKey::EC::Group.new(algo)
+    def self.key_from_hex_keys(private_hex, curve = Curves::P256)
+      group = OpenSSL::PKey::EC::Group.new(curve)
       new_key = OpenSSL::PKey::EC.new(group)
       new_key.private_key = OpenSSL::BN.new(private_hex, 16)
       new_key.public_key = group.generator.mul(new_key.private_key)

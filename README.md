@@ -68,7 +68,7 @@ res = client.ping
 #### Retrieve a block by ID
 ```ruby
 latest_block = client.get_latest_block
-res = client.get_block_by_id(latest_block.block.id.unpack1("H*"))
+res = client.get_block_by_id(latest_block.id.unpack1("H*"))
 ```
 
 #### Retrieve a block by height
@@ -248,7 +248,7 @@ new_account = client.get_account(new_account.address)
 
 @transaction = FlowClient::Transaction.new
 @transaction.script = script
-@transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+@transaction.reference_block_id = client.get_latest_block.id.unpack1("H*")
 @transaction.gas_limit = gas_limit
 @transaction.proposer_address = new_account.address
 @transaction.proposer_key_index = new_account.keys[0].index

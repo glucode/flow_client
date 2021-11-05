@@ -28,7 +28,7 @@ module FlowClient
 
     # Accounts
 
-    # Gets account detail for address
+    # Gets an account
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
 
@@ -39,7 +39,7 @@ module FlowClient
       else
         account = FlowClient::Account.new(
           address: res.account.address.unpack1("H*"),
-          balance: res.account.balance
+          balance: res.account.balance/100000000.0
         )
 
         res.account.keys.each do |key|
@@ -77,7 +77,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -100,8 +100,8 @@ module FlowClient
       new_account
     end
 
-    # Add account key
-    def add_account_key(_address, public_key_hex, payer_account, signer, weight)
+    # Adds a public key to an account
+    def add_account_key(public_key_hex, payer_account, signer, weight)
       script = File.read(File.join("lib", "cadence", "templates", "add-account-key.cdc"))
 
       arguments = [
@@ -117,7 +117,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -132,8 +132,7 @@ module FlowClient
       end
     end
 
-    # Contracts
-
+    # Adds a contract to an account
     def add_contract(name, code, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "add-contract.cdc"))
       code_hex = code.unpack1("H*")
@@ -151,7 +150,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -166,6 +165,7 @@ module FlowClient
       end
     end
 
+    # Removes a contract from an account
     def remove_contract(name, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "remove-contract.cdc"))
 
@@ -178,7 +178,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -193,6 +193,7 @@ module FlowClient
       end
     end
 
+    # Updates a contract on an account
     def update_contract(name, code, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "update-contract.cdc"))
       code_hex = code.unpack1("H*")
@@ -210,7 +211,7 @@ module FlowClient
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
-      transaction.reference_block_id = get_latest_block.block.id.unpack1("H*")
+      transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
@@ -240,30 +241,33 @@ module FlowClient
       req = Access::GetLatestBlockRequest.new(
         is_sealed: is_sealed
       )
-      @stub.get_latest_block(req)
+      res = @stub.get_latest_block(req)
+      Block.parse_grpc_block_response(res)
     end
 
     def get_block_by_id(id)
       req = Access::GetBlockByIDRequest.new(
         id: to_bytes(id)
       )
-      @stub.get_block_by_id(req)
+      res = @stub.get_block_by_id(req)
+      Block.parse_grpc_block_response(res)
     end
 
     def get_block_by_height(height)
       req = Access::GetBlockByHeightRequest.new(
         height: height
       )
-      @stub.get_block_by_height(req)
+      res = @stub.get_block_by_height(req)
+      Block.parse_grpc_block_response(res)
     end
 
     # Collections
-
     def get_collection_by_id(id)
       req = Access::GetCollectionByIDRequest.new(
         id: to_bytes(id)
       )
-      @stub.get_collection_by_id(req)
+      res = @stub.get_collection_by_id(req)
+      Collection.parse_grpc_type(res)
     end
 
     # Events
@@ -273,12 +277,19 @@ module FlowClient
         start_height: start_height,
         end_height: end_height
       )
-      @stub.get_events_for_height_range(req)
+      begin
+        res = @stub.get_events_for_height_range(req)
+        puts res.inspect
+      rescue GRPC::BadStatus => e
+        raise ClientError, e.details
+      else
+        res.results.map { |event| EventsResult.parse_grpc_type(event) }
+      end
     end
 
     # Transactions
 
-    # Send a FlowClient::Transaction transaction to the blockchain
+    # Sends a transaction to the blockchain
     def send_transaction(transaction)
       transaction.address_aliases = @address_aliases
       req = Access::SendTransactionRequest.new(
@@ -291,9 +302,17 @@ module FlowClient
       req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
       )
-      @stub.get_transaction(req)
+
+      begin
+        res = @stub.get_transaction(req)
+      rescue GRPC::BadStatus => e
+        raise ClientError, e.details
+      else
+        Transaction.parse_grpc_type(res.transaction)
+      end
     end
 
+    # Returns a transaction result
     def get_transaction_result(transaction_id)
       req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
@@ -304,7 +323,7 @@ module FlowClient
     def wait_for_transaction(transaction_id)
       response = get_transaction_result(transaction_id)
       while response.status != :SEALED
-        sleep(1)
+        sleep(0.5)
         response = get_transaction_result(transaction_id)
       end
 

@@ -5,7 +5,7 @@ require "rlp"
 RSpec.describe FlowClient::Transaction do
   let(:service_account_address) { "f8d6e0586b0a20c7" }
   let(:client) { FlowClient::Client.new("localhost:3569") }
-  let(:reference_block_id) { client.get_latest_block.block.id.unpack1("H*") }
+  let(:reference_block_id) { client.get_latest_block.id }
   let(:gas_limit) { 100 }
   let(:arguments) { [{ type: "String", value: "Hello world!" }.to_json] }
 
@@ -62,7 +62,7 @@ RSpec.describe FlowClient::Transaction do
     end
   end
 
-  describe "envelope signatures" do
+  describe "signing" do
     let(:padded_address) do
       FlowClient::Utils.left_pad_bytes([service_account_address].pack("H*").bytes, 8).pack("C*")
     end
@@ -105,7 +105,7 @@ RSpec.describe FlowClient::Transaction do
 
         auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
         auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
-        client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one, 500.0)
+        client.add_account_key(pub_key_two, new_account, auth_signer_one, 500.0)
 
         new_account = client.get_account(new_account.address)
 
@@ -113,7 +113,7 @@ RSpec.describe FlowClient::Transaction do
 
         @transaction = FlowClient::Transaction.new
         @transaction.script = script
-        @transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+        @transaction.reference_block_id = client.get_latest_block.id
         @transaction.gas_limit = gas_limit
         @transaction.proposer_address = new_account.address
         @transaction.proposer_key_index = new_account.keys[0].index
@@ -145,7 +145,7 @@ RSpec.describe FlowClient::Transaction do
 
         transaction = FlowClient::Transaction.new
         transaction.script = script
-        transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+        transaction.reference_block_id = client.get_latest_block.id
         transaction.proposer_address = new_account.address
         transaction.proposer_key_index = new_account.keys.first.index
         transaction.arguments = arguments
@@ -179,12 +179,12 @@ RSpec.describe FlowClient::Transaction do
         priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
         new_account_one = client.create_account(pub_key_one, payer_account, payer_signer)
         auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
-        client.add_account_key(new_account_one.address, pub_key_one, new_account_one, auth_signer_one, 1000.0)
+        client.add_account_key(pub_key_one, new_account_one, auth_signer_one, 1000.0)
         new_account_one = client.get_account(new_account_one.address)
 
         @transaction = FlowClient::Transaction.new
         @transaction.script = script
-        @transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+        @transaction.reference_block_id = client.get_latest_block.id
         @transaction.gas_limit = gas_limit
         @transaction.arguments = []
 
@@ -219,7 +219,7 @@ RSpec.describe FlowClient::Transaction do
         payer_account = client.get_account(service_account_address)
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_signer_two = FlowClient::LocalSigner.new(payer_priv_key_two)
-        client.add_account_key(payer_account.address, payer_pub_key_two, payer_account, payer_signer, 500.0)
+        client.add_account_key(payer_pub_key_two, payer_account, payer_signer, 500.0)
         payer_account = client.get_account(payer_account.address)
 
         # Create a new account
@@ -231,15 +231,15 @@ RSpec.describe FlowClient::Transaction do
         auth_signer_three = FlowClient::LocalSigner.new(priv_key_three)
 
         # Add the public keys to the new account
-        client.add_account_key(new_account.address, pub_key_two, new_account, auth_signer_one, 500.0)
-        client.add_account_key(new_account.address, pub_key_three, new_account, auth_signer_one, 500.0)
+        client.add_account_key(pub_key_two, new_account, auth_signer_one, 500.0)
+        client.add_account_key(pub_key_three, new_account, auth_signer_one, 500.0)
 
         new_account = client.get_account(new_account.address)
         expect(client.get_account(new_account.address).keys.count).to eq(3)
 
         @transaction = FlowClient::Transaction.new
         @transaction.script = script
-        @transaction.reference_block_id = client.get_latest_block.block.id.unpack1("H*")
+        @transaction.reference_block_id = client.get_latest_block.id
         @transaction.gas_limit = gas_limit
         @transaction.arguments = []
 

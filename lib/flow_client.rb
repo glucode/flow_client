@@ -12,5 +12,11 @@ module FlowClient
   require "flow_client/client"
   require "flow_client/transaction"
   require "flow_client/account"
+  require "flow_client/block"
+  require "flow_client/collection"
   require "flow_client/signer"
+  require "flow_client/proposal_key"
+  require "flow_client/event"
+  require "flow_client/cadence_type.rb"
+  require "flow_client/signature"
 end

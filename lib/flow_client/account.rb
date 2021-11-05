@@ -7,12 +7,13 @@ module FlowClient
                   :sign_algo, :hash_algo,
                   :weight, :revoked
 
-    def initialize(public_key: nil, index: nil, sequence_number: nil, weight: 1000, revoked: false)
+    def initialize(public_key: nil, index: nil, sequence_number: nil, weight: 1000, revoked: false, hash_algo: FlowClient::Crypto::HashAlgos::SHA3_256)
       @public_key = public_key
       @index = index
       @sequence_number = sequence_number
       @weight = weight
       @revoked = revoked
+      @hash_algo = hash_algo
     end
   end
 
