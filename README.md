@@ -1,10 +1,10 @@
 <br />
 <div align="center">
-  <a href="https://github.com/glucode/flow_client">
+  <a href="">
     <img src="./logo@2x.png" alt="Logo" width="300" height="auto">
   </a>
   <p align="center"> <br />
-    <a href="https://github.com/glucode/flow_client"><strong>View on GitHub »</strong></a> <br /><br />
+    <a href=""><strong>View on GitHub »</strong></a> <br /><br />
     <a href="https://docs.onflow.org/sdk-guidelines/">SDK Specifications</a> ·
     <a href="https://github.com/glucode/flow_client">Contribute</a> ·
     <a href="https://github.com/glucode/flow_client">Report a Bug</a>
@@ -478,12 +478,16 @@ Signatures can be generated more securely using keys stored in a hardware device
 
 Simple signature example:
 ```ruby
-transaction.proposer_address = new_account.address
-transaction.proposer_key_index = new_account.keys[0].index
-transaction.proposer_key_sequence_number = new_account.keys[0].sequence_number
-transaction.payer_address = new_account.address
-transaction.authorizer_addresses = [new_account.address]
-transaction.add_envelope_signature(new_account.address, new_account.keys[0].index, auth_signer_one)
+account = FlowClient::Account.new(address: 0x01)
+signer = FlowClient::LocalSigner.new("<private key hex>")
+
+transaction.proposer_address = account.address
+transaction.proposer_key_index = account.keys.first.index
+transaction.proposer_key_sequence_number = account.keys.first.sequence_number
+transaction.payer_address = account.address
+transaction.authorizer_addresses = [account.address]
+
+transaction.add_envelope_signature(account.address, account.keys.first.index, signer)
 ```
 
 Flow supports great flexibility when it comes to transaction signing, we can define multiple authorizers (multi-sig transactions) and have different payer account than proposer. We will explore advanced signing scenarios bellow.
