@@ -173,4 +173,14 @@ module FlowClient
       result
     end
   end
+
+  class TransactionResponse
+    attr_accessor :id
+
+    def self.parse_grpc_type(type)
+      response = TransactionResponse.new
+      response.id = type.id.unpack1("H*")
+      response
+    end
+  end
 end

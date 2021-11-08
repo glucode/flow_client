@@ -88,7 +88,7 @@ RSpec.describe FlowClient::Transaction do
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         transaction.add_envelope_signature(service_account_address, 0, signer)
         tx = client.send_transaction(transaction)
-        client.wait_for_transaction(tx.id.unpack1("H*")) do |result|
+        client.wait_for_transaction(tx.id) do |result|
           expect(result.status_code).to be(0)
         end
       end
@@ -124,7 +124,7 @@ RSpec.describe FlowClient::Transaction do
         @transaction.add_envelope_signature(new_account.address, new_account.keys[0].index, auth_signer_one)
         @transaction.add_envelope_signature(new_account.address, new_account.keys[1].index, auth_signer_two)
         tx_res = client.send_transaction(@transaction)
-        client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+        client.wait_for_transaction(tx_res.id) do |response|
           expect(response.status_code).to eq(0)
         end
       end
@@ -157,7 +157,7 @@ RSpec.describe FlowClient::Transaction do
 
         res = client.send_transaction(transaction)
 
-        client.wait_for_transaction(res.id.unpack1("H*")) do |response|
+        client.wait_for_transaction(res.id) do |response|
           expect(response.status_code).to be(0)
         end
       end
@@ -199,7 +199,8 @@ RSpec.describe FlowClient::Transaction do
         @transaction.add_envelope_signature(payer_account.address, payer_account.keys[0].index, payer_signer)
 
         tx_res = client.send_transaction(@transaction)
-        client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+        puts tx_res
+        client.wait_for_transaction(tx_res.id) do |response|
           expect(response.status_code).to eq(0)
         end
       end
@@ -257,7 +258,7 @@ RSpec.describe FlowClient::Transaction do
         @transaction.add_envelope_signature(payer_account.address, payer_account.keys.last.index, payer_signer_two)
 
         tx_res = client.send_transaction(@transaction)
-        client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+        client.wait_for_transaction(tx_res.id) do |response|
           expect(response.status_code).to eq(0)
         end
       end

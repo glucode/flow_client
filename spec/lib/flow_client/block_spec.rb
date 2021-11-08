@@ -33,14 +33,10 @@ RSpec.describe FlowClient::Block do
         transaction.authorizer_addresses = [account.address]
         transaction.add_envelope_signature(account.address, 0, signer)
         tx = client.send_transaction(transaction)
-        client.wait_for_transaction(tx.id.unpack1("H*")) do |result|
+        client.wait_for_transaction(tx.id) do |result|
           puts result.inspect
         end
 
-        puts client.get_transaction(tx.id.unpack1("H*")).inspect
-      end
-
-      it "" do
       end
 
       # it { expect(block.id).to eq(response.id) }

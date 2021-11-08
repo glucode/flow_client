@@ -93,7 +93,7 @@ module FlowClient
       res = send_transaction(transaction)
 
       new_account = nil
-      wait_for_transaction(res.id.unpack1("H*")) do |response|
+      wait_for_transaction(res.id) do |response|
         raise CadenceRuntimeError, response.error_message if response.status_code != 0
 
         event_payload = response.events.select { |e| e.type == "flow.AccountCreated" }.first.payload
@@ -132,7 +132,7 @@ module FlowClient
       transaction.add_envelope_signature(payer_account.address, 0, signer)
       res = send_transaction(transaction)
 
-      wait_for_transaction(res.id.unpack1("H*")) do |response|
+      wait_for_transaction(res.id) do |response|
         raise CadenceRuntimeError, response.error_message if response.status_code != 0
       end
     end
@@ -165,7 +165,7 @@ module FlowClient
       transaction.add_envelope_signature(payer_account.address, 0, signer)
       res = send_transaction(transaction)
 
-      wait_for_transaction(res.id.unpack1("H*")) do |response|
+      wait_for_transaction(res.id) do |response|
         raise CadenceRuntimeError, response.error_message if response.status_code != 0
       end
     end
@@ -193,7 +193,7 @@ module FlowClient
       transaction.add_envelope_signature(payer_account.address, 0, signer)
       res = send_transaction(transaction)
 
-      wait_for_transaction(res.id.unpack1("H*")) do |response|
+      wait_for_transaction(res.id) do |response|
         raise CadenceRuntimeError, response.error_message if response.status_code != 0
       end
     end
@@ -226,7 +226,7 @@ module FlowClient
       transaction.add_envelope_signature(payer_account.address, 0, signer)
       res = send_transaction(transaction)
 
-      wait_for_transaction(res.id.unpack1("H*")) do |response|
+      wait_for_transaction(res.id) do |response|
         raise CadenceRuntimeError, response.error_message if response.status_code != 0
       end
     end
@@ -307,7 +307,14 @@ module FlowClient
       req = Access::SendTransactionRequest.new(
         transaction: transaction.to_protobuf_message
       )
-      @stub.send_transaction(req)
+
+      begin
+        res = @stub.send_transaction(req)
+      rescue GRPC::BadStatus => e
+        raise ClientError, e.details
+      else
+        TransactionResponse.parse_grpc_type(res)
+      end
     end
 
     def get_transaction(transaction_id)
