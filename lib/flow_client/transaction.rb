@@ -13,9 +13,6 @@ module FlowClient
                   :arguments,
                   :reference_block_id,
                   :gas_limit,
-                  :proposer_address,
-                  :proposer_key_index,
-                  :proposer_key_sequence_number,
                   :payer_address,
                   :authorizer_addresses,
                   :address_aliases,
@@ -32,12 +29,9 @@ module FlowClient
       @gas_limit = 0
       @envelope_signatures = []
       @payload_signatures = []
-      @proposer_address = nil
-      @proposer_key_index = 0
-      @proposer_key_sequence_number = 0
       @address_aliases = {}
       @signers = {}
-      @proposal_key = nil
+      @proposal_key = ProposalKey.new
     end
 
     def arguments=(arguments)
@@ -45,6 +39,18 @@ module FlowClient
         processed_arg = arg.class == OpenStruct ? Utils.openstruct_to_json(arg) : arg
         @arguments << processed_arg
       end
+    end
+
+    def proposer_address=(address)
+      @proposal_key.address = address
+    end
+
+    def proposer_key_index=(index)
+      @proposal_key.key_id = index
+    end
+
+    def proposer_key_sequence_number=(sequence_number)
+      @proposal_key.sequence_number = sequence_number
     end
 
     def self.padded_transaction_domain_tag
@@ -55,8 +61,8 @@ module FlowClient
       [
         resolved_script, @arguments,
         [@reference_block_id].pack("H*"), @gas_limit,
-        padded_address(@proposer_address), @proposer_key_index,
-        @proposer_key_sequence_number, padded_address(@payer_address),
+        padded_address(@proposal_key.address), @proposal_key.key_id,
+        @proposal_key.sequence_number, padded_address(@payer_address),
         @authorizer_addresses.map { |address| padded_address(address) }
       ]
     end
@@ -67,7 +73,7 @@ module FlowClient
     end
 
     def envelope_canonical_form
-      @signers[@proposer_address] = 0
+      @signers[@proposal_key.address] = 0
 
       @payload_signatures.each do |sig|
         @signers[sig.address] = @signers.keys.count

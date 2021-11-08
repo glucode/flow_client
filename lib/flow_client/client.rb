@@ -75,15 +75,12 @@ module FlowClient
         ),
       ]
 
-      # puts arguments.inspect
-
       transaction = FlowClient::Transaction.new
       transaction.script = script
       transaction.reference_block_id = get_latest_block.id
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
-      puts transaction.arguments.inspect
       transaction.proposer_key_sequence_number = get_account(payer_account.address).keys.first.sequence_number
       transaction.payer_address = payer_account.address
       transaction.authorizer_addresses = [payer_account.address]
@@ -289,7 +286,6 @@ module FlowClient
       )
       begin
         res = @stub.get_events_for_height_range(req)
-        puts res.inspect
       rescue GRPC::BadStatus => e
         raise ClientError, e.details
       else

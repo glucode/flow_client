@@ -6,8 +6,8 @@ module FlowClient
 
     def initialize(address: nil, key_id: nil, sequence_number: nil)
       @address = address
-      @sequence_number = key_id
-      @key_id = sequence_number
+      @sequence_number = sequence_number
+      @key_id = key_id
     end
 
     def self.parse_grpc_type(type)
