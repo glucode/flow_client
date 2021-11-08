@@ -32,11 +32,8 @@ RSpec.describe FlowClient::Client do
 
       it "creates a new account" do
         nft_contract = File.read(File.join("lib", "cadence", "contracts", "NonFungibleToken.cdc"))
-
-
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
-
 
         new_account = client.create_account([@pub_key], { "NonFungibleToken": nft_contract }, payer_account, signer)
 
