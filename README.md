@@ -312,7 +312,7 @@ script = %{
   }
 }
 
-args = [{ type: 'Int', value: "1" }.to_json]
+args = [FlowClient::CadenceType.Int(1)]
 res = client.execute_script(script, args)
 ```
 
