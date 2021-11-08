@@ -135,7 +135,9 @@ module FlowClient
     end
 
     def self.Array(values)
-      OpenStruct.new(type: "Array", value: values.to_a)
+      os = OpenStruct.new(type: "Array", value: values)
+      puts os.inspect
+      os
     end
 
     def self.Dictionary(values)

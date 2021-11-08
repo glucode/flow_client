@@ -46,17 +46,33 @@ module FlowClient
     end
 
     def self.openstruct_to_json(struct)
-      struct.each_pair.map do |key, value|
-        [
-          key,
-          case value
-            when OpenStruct then value.deep_to_h
-            when Array then value.map {|el| el.class == OpenStruct ? el.deep_to_h : el}
-            else value
-          end
-        ]
-      end.to_h.to_json
+      struct.deep_to_h.to_json
+      # struct.each_pair.map do |key, value|
+      #   [
+      #     key,
+      #     case value
+      #       when OpenStruct then value.deep_to_h
+      #       when Array then value.map {|el| el.class == OpenStruct ? el.deep_to_h : el}
+      #       else value
+      #     end
+      #   ]
+      # end.to_h.to_json
     end
 
+  end
+end
+
+class OpenStruct
+  def deep_to_h
+    each_pair.map do |key, value|
+      [
+        key,
+        case value
+          when OpenStruct then value.deep_to_h
+          when Array then value.map {|el| el.class == OpenStruct ? el.deep_to_h : el}
+          else value
+        end
+      ]
+    end.to_h
   end
 end

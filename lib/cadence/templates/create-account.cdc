@@ -1,5 +1,3 @@
-import Crypto
-
 transaction(publicKeys: [String], contracts: {String: String}) {
 	prepare(signer: AuthAccount) {
 		let acct = AuthAccount(payer: signer)
@@ -14,6 +12,10 @@ transaction(publicKeys: [String], contracts: {String: String}) {
 				hashAlgorithm: HashAlgorithm.SHA3_256,
 				weight: 1000.0
 			)
+		}
+	
+		for contract in contracts.keys {
+			acct.contracts.add(name: contract, code: contracts[contract]!.decodeHex())
 		}
 	}
 }

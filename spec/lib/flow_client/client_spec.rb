@@ -31,25 +31,31 @@ RSpec.describe FlowClient::Client do
       end
 
       it "creates a new account" do
+        nft_contract = File.read(File.join("lib", "cadence", "contracts", "NonFungibleToken.cdc"))
+
+
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
-        new_account = client.create_account(@pub_key, payer_account, signer)
+
+
+        new_account = client.create_account([@pub_key], { "NonFungibleToken": nft_contract }, payer_account, signer)
 
         expect(new_account).to be_an_instance_of(FlowClient::Account)
         expect(new_account.address).not_to be_nil
         expect(new_account.balance).not_to be_nil
         expect(new_account.keys).not_to be_nil
+        expect(new_account.contracts.count).to eq(1)
       end
     end
 
     describe "add_account_key" do
       it "adds the key to the account" do
-        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
-        _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
+        _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
 
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
-        new_account = client.create_account(pub_key_one, payer_account, signer)
+        new_account = client.create_account([pub_key_one], {}, payer_account, signer)
 
         signer = FlowClient::LocalSigner.new(priv_key_one)
         client.add_account_key(pub_key_two, new_account, signer, 1000.0)

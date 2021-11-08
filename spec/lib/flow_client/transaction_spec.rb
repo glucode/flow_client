@@ -101,7 +101,7 @@ RSpec.describe FlowClient::Transaction do
 
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
-        new_account = client.create_account(pub_key_one, payer_account, payer_signer)
+        new_account = client.create_account([pub_key_one], {}, payer_account, payer_signer)
 
         auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
         auth_signer_two = FlowClient::LocalSigner.new(priv_key_two)
@@ -138,7 +138,7 @@ RSpec.describe FlowClient::Transaction do
         payer_signer = FlowClient::LocalSigner.new(service_account_private_key)
 
         # Create a new account that will be executing the transaction
-        new_account = client.create_account(authorizer_pub_key, service_account, payer_signer)
+        new_account = client.create_account([authorizer_pub_key], {}, service_account, payer_signer)
         authorizer_signer = FlowClient::LocalSigner.new(
           authorizer_priv_key
         )
@@ -177,7 +177,7 @@ RSpec.describe FlowClient::Transaction do
 
         # Create a new account
         priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
-        new_account_one = client.create_account(pub_key_one, payer_account, payer_signer)
+        new_account_one = client.create_account([pub_key_one], {}, payer_account, payer_signer)
         auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)
         client.add_account_key(pub_key_one, new_account_one, auth_signer_one, 1000.0)
         new_account_one = client.get_account(new_account_one.address)
@@ -224,7 +224,7 @@ RSpec.describe FlowClient::Transaction do
         payer_account = client.get_account(payer_account.address)
 
         # Create a new account
-        new_account = client.create_account(pub_key_one, payer_account, payer_signer)
+        new_account = client.create_account([pub_key_one], {}, payer_account, payer_signer)
 
         # Create in-memory signers with the private keys
         auth_signer_one = FlowClient::LocalSigner.new(priv_key_one)

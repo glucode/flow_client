@@ -61,24 +61,21 @@ module FlowClient
     # Creates a new account
     #
     # 
-    def create_account(new_account_public_key, payer_account, signer)
+    def create_account(new_account_public_keys, contracts, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "create-account.cdc"))
 
       arguments = [
-        # CadenceType.Array(
-        #   [CadenceType.String(new_account_public_key)]
-        # ),
-        {
-          type: "Array",
-          value: [
-            { type: "String", value: new_account_public_key }
-          ]
-        }.to_json,
-        {
-          type: "Dictionary",
-          value: []
-        }.to_json
+        CadenceType.Array(
+          new_account_public_keys.to_a.map { |key| CadenceType.String(key) }
+        ),
+        CadenceType.Dictionary(
+          contracts.to_a.map { |name, code| CadenceType.DictionaryValue(
+            CadenceType.String(name), CadenceType.String(code.unpack1("H*"))
+          ) }
+        ),
       ]
+
+      # puts arguments.inspect
 
       transaction = FlowClient::Transaction.new
       transaction.script = script
@@ -86,6 +83,7 @@ module FlowClient
       transaction.proposer_address = payer_account.address
       transaction.proposer_key_index = 0
       transaction.arguments = arguments
+      puts transaction.arguments.inspect
       transaction.proposer_key_sequence_number = get_account(payer_account.address).keys.first.sequence_number
       transaction.payer_address = payer_account.address
       transaction.authorizer_addresses = [payer_account.address]
