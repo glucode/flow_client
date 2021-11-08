@@ -199,7 +199,6 @@ RSpec.describe FlowClient::Transaction do
         @transaction.add_envelope_signature(payer_account.address, payer_account.keys[0].index, payer_signer)
 
         tx_res = client.send_transaction(@transaction)
-        puts tx_res
         client.wait_for_transaction(tx_res.id) do |response|
           expect(response.status_code).to eq(0)
         end

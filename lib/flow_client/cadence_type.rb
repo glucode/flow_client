@@ -2,11 +2,19 @@ require "ostruct"
 
 module FlowClient
   module CadenceType
-    def self.String(string)
-      OpenStruct.new(type: "String", value: string.to_s)
+    # class CadenceType
+    #   def to_json
+    #   end
+    # end
+
+    # class String
+    # end
+
+    def self.String(value)
+      OpenStruct.new(type: "String", value: value.to_s)
     end
 
-    def self.Optional(value: nil)
+    def self.Optional(value = nil)
       OpenStruct.new(type: "Optional", value: value)
     end
 
@@ -135,9 +143,7 @@ module FlowClient
     end
 
     def self.Array(values)
-      os = OpenStruct.new(type: "Array", value: values)
-      puts os.inspect
-      os
+      OpenStruct.new(type: "Array", value: values)
     end
 
     def self.Dictionary(values)
@@ -172,6 +178,20 @@ module FlowClient
           borrow_type: borrow_type.to_s
         )
       )
+    end
+
+    def self.Composite(type, value)
+      valid_types = [:struct, :resource, :event, :contract, :enum]
+      raise ArgumentError.new("incorrect type, expected :struct, :resource, :event, :contract or :enum") unless valid_types.include? type
+      OpenStruct.new(type: type.to_s.capitalize, value: value)
+    end
+
+    def self.CompositeValue(id, fields)
+      OpenStruct.new(id: id, fields: fields)
+    end
+
+    def self.Field(name, value)
+      OpenStruct.new(name: name, value: value)
     end
   end
 end
