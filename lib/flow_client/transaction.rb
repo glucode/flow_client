@@ -40,6 +40,13 @@ module FlowClient
       @proposal_key = nil
     end
 
+    def arguments=(arguments)
+      arguments.to_a.each do |arg|
+        processed_arg = arg.class == OpenStruct ? Utils.openstruct_to_json(arg) : arg
+        @arguments << processed_arg
+      end
+    end
+
     def self.padded_transaction_domain_tag
       Utils.right_pad_bytes(TRANSACTION_DOMAIN_TAG.bytes, 32).pack("c*")
     end
@@ -148,6 +155,4 @@ module FlowClient
       Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")
     end
   end
-
-
 end

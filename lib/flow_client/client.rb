@@ -228,10 +228,17 @@ module FlowClient
 
     # Scripts
     def execute_script(script, args = [])
+      processed_args = []
+      args.to_a.each do |arg|
+        processed_arg = arg.class == OpenStruct ? Utils.openstruct_to_json(arg) : arg
+        processed_args << processed_arg
+      end
+
       req = Access::ExecuteScriptAtLatestBlockRequest.new(
         script: FlowClient::Utils.substitute_address_aliases(script, @address_aliases),
-        arguments: args
+        arguments: processed_args
       )
+      
       res = @stub.execute_script_at_latest_block(req)
       parse_json(res.value)
     end

@@ -149,7 +149,7 @@ RSpec.describe FlowClient::Client do
         }
       }
       
-      args = [{ type: 'Int', value: "1" }.to_json]
+      args = [FlowClient.Int(1)]
       res = client.execute_script(script, args)
 
       expect(res.type).to eq("Int")
