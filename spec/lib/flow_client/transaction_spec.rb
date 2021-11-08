@@ -7,7 +7,7 @@ RSpec.describe FlowClient::Transaction do
   let(:client) { FlowClient::Client.new("localhost:3569") }
   let(:reference_block_id) { client.get_latest_block.id }
   let(:gas_limit) { 100 }
-  let(:arguments) { [FlowClient.String("Hello world!")] }
+  let(:arguments) { [FlowClient::CadenceType.String("Hello world!")] }
 
   let(:service_account_private_key) do
     "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"

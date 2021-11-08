@@ -6,8 +6,8 @@
   <p align="center"> <br />
     <a href=""><strong>View on GitHub »</strong></a> <br /><br />
     <a href="https://docs.onflow.org/sdk-guidelines/">SDK Specifications</a> ·
-    <a href="">Contribute</a> ·
-    <a href="">Report a Bug</a>
+    <a href="https://github.com/glucode/flow_client">Contribute</a> ·
+    <a href="https://github.com/glucode/flow_client">Report a Bug</a>
   </p>
 </div><br />
 
@@ -18,8 +18,7 @@ SDKs are open source, and you can use them according to the licence.
 
 The library client specifications can be found here:
 
-// TODO specs here
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]()
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 
 ## Getting Started
@@ -43,7 +42,7 @@ require 'flow_client'
 ```
 
 ## Connect
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 The library uses gRPC to communicate with the access nodes and it must be configured with correct access node API URL. 
 
@@ -63,7 +62,7 @@ res = client.ping
 After you have established a connection with an access node, you can query the Flow network to retrieve data about blocks, accounts, events and transactions. We will explore how to retrieve each of these entities in the sections below.
 
 ### Get Blocks
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Query the network for block by id, height or get the latest block.
 
@@ -105,7 +104,7 @@ Result output:
 ```
 
 ### Get Account
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Retrieve any account from Flow network's latest block or from a specified block height.
 
@@ -121,16 +120,20 @@ An account includes the following data:
 Example depicts ways to get an account at the latest block and at a specific block height:
 
 ```ruby
-account = client.get_account("0x01")
+account = client.get_account("01cf0e2f2f715450")
 ```
 Result output:
 ```ruby
-// TODO get account result
+#<FlowClient::Account:0x00007f84eb281ac8
+ @address="01cf0e2f2f715450",
+ @balance=0.001,
+ @contracts={},
+ @keys=[#<FlowClient::AccountKey:0x00007f84eb281848 @hash_algo="SHA3-256", @index=0, @public_key="6f489d349fee5a0436cac0605820429907b05eb772c194ebf429d71caee70d2b2499be9e6c4e17d81f157466ac3d793b217fd091e89a172b11cac81d2378385b", @revoked=false, @sequence_number=0, @weight=1000>]>
 ```
 
 
 ### Get Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Retrieve transactions from the network by providing a transaction ID. After a transaction has been submitted, you can also get the transaction result to check the status.
 
@@ -150,11 +153,11 @@ Retrieve transactions from the network by providing a transaction ID. After a tr
 |   EXPIRED    |   ✅     |  The transaction reference block is outdated before being executed    |
 
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">]()** // TODO example link
 ```ruby
 transaction = client.get_transaction("d46e54de8c34dfe58a22c15d24689d1ad255f67bb9868605fcac28417aa54a37")
 ```
 
+Example output:
 ```ruby
 #<FlowClient::Transaction:0x00007fad65ad54e8
  @address_aliases={},
@@ -179,13 +182,61 @@ transaction_result = client.get_transaction_result("84c8732a6cef4b66e74cef4492af
 ```
 
 Example output:
-```bash
-// TODO example output
+```ruby
+#<FlowClient::TransactionResult:0x00007f9bf425f7c8
+ @block_id="0000000000000000000000000000000000000000000000000000000000000000",
+ @error_message="",
+ @events=
+  [#<FlowClient::Event:0x00007f9bf425e968
+    @event_index=0,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn\",\"fields\":[{\"name\":\"amount\",\"value\":{\"type\":\"UFix64\",\"value\":\"0.00100000\"}},{\"name\":\"from\",\"value\":{\"type\":\"Optional\",\"value\":{\"type\":\"Address\",\"value\":\"0xf8d6e0586b0a20c7\"}}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn">,
+   #<FlowClient::Event:0x00007f9bf425e6c0
+    @event_index=1,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn\",\"fields\":[{\"name\":\"amount\",\"value\":{\"type\":\"UFix64\",\"value\":\"0.00100000\"}},{\"name\":\"from\",\"value\":{\"type\":\"Optional\",\"value\":null}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn">,
+   #<FlowClient::Event:0x00007f9bf425e170
+    @event_index=2,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"A.0ae53cb6e3f42a79.FlowToken.TokensDeposited\",\"fields\":[{\"name\":\"amount\",\"value\":{\"type\":\"UFix64\",\"value\":\"0.00000000\"}},{\"name\":\"to\",\"value\":{\"type\":\"Optional\",\"value\":{\"type\":\"Address\",\"value\":\"0xe5a8b7f23e8b548f\"}}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="A.0ae53cb6e3f42a79.FlowToken.TokensDeposited">,
+   #<FlowClient::Event:0x00007f9bf425e080
+    @event_index=3,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"A.e5a8b7f23e8b548f.FlowFees.TokensDeposited\",\"fields\":[{\"name\":\"amount\",\"value\":{\"type\":\"UFix64\",\"value\":\"0.00000000\"}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="A.e5a8b7f23e8b548f.FlowFees.TokensDeposited">,
+   #<FlowClient::Event:0x00007f9bf425df68
+    @event_index=4,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"A.0ae53cb6e3f42a79.FlowToken.TokensDeposited\",\"fields\":[{\"name\":\"amount\",\"value\":{\"type\":\"UFix64\",\"value\":\"0.00100000\"}},{\"name\":\"to\",\"value\":{\"type\":\"Optional\",\"value\":{\"type\":\"Address\",\"value\":\"0x01cf0e2f2f715450\"}}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="A.0ae53cb6e3f42a79.FlowToken.TokensDeposited">,
+   #<FlowClient::Event:0x00007f9bf425de78
+    @event_index=5,
+    @payload="{\"type\":\"Event\",\"value\":{\"id\":\"flow.AccountCreated\",\"fields\":[{\"name\":\"address\",\"value\":{\"type\":\"Address\",\"value\":\"0x01cf0e2f2f715450\"}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="flow.AccountCreated">,
+   #<FlowClient::Event:0x00007f9bf425d950
+    @event_index=6,
+    @payload=
+     "{\"type\":\"Event\",\"value\":{\"id\":\"flow.AccountKeyAdded\",\"fields\":[{\"name\":\"address\",\"value\":{\"type\":\"Address\",\"value\":\"0x01cf0e2f2f715450\"}},{\"name\":\"publicKey\",\"value\":{\"type\":\"Struct\",\"value\":{\"id\":\"PublicKey\",\"fields\":[{\"name\":\"publicKey\",\"value\":{\"type\":\"Array\",\"value\":[{\"type\":\"UInt8\",\"value\":\"111\"},{\"type\":\"UInt8\",\"value\":\"72\"},{\"type\":\"UInt8\",\"value\":\"157\"},{\"type\":\"UInt8\",\"value\":\"52\"},{\"type\":\"UInt8\",\"value\":\"159\"},{\"type\":\"UInt8\",\"value\":\"238\"},{\"type\":\"UInt8\",\"value\":\"90\"},{\"type\":\"UInt8\",\"value\":\"4\"},{\"type\":\"UInt8\",\"value\":\"54\"},{\"type\":\"UInt8\",\"value\":\"202\"},{\"type\":\"UInt8\",\"value\":\"192\"},{\"type\":\"UInt8\",\"value\":\"96\"},{\"type\":\"UInt8\",\"value\":\"88\"},{\"type\":\"UInt8\",\"value\":\"32\"},{\"type\":\"UInt8\",\"value\":\"66\"},{\"type\":\"UInt8\",\"value\":\"153\"},{\"type\":\"UInt8\",\"value\":\"7\"},{\"type\":\"UInt8\",\"value\":\"176\"},{\"type\":\"UInt8\",\"value\":\"94\"},{\"type\":\"UInt8\",\"value\":\"183\"},{\"type\":\"UInt8\",\"value\":\"114\"},{\"type\":\"UInt8\",\"value\":\"193\"},{\"type\":\"UInt8\",\"value\":\"148\"},{\"type\":\"UInt8\",\"value\":\"235\"},{\"type\":\"UInt8\",\"value\":\"244\"},{\"type\":\"UInt8\",\"value\":\"41\"},{\"type\":\"UInt8\",\"value\":\"215\"},{\"type\":\"UInt8\",\"value\":\"28\"},{\"type\":\"UInt8\",\"value\":\"174\"},{\"type\":\"UInt8\",\"value\":\"231\"},{\"type\":\"UInt8\",\"value\":\"13\"},{\"type\":\"UInt8\",\"value\":\"43\"},{\"type\":\"UInt8\",\"value\":\"36\"},{\"type\":\"UInt8\",\"value\":\"153\"},{\"type\":\"UInt8\",\"value\":\"190\"},{\"type\":\"UInt8\",\"value\":\"158\"},{\"type\":\"UInt8\",\"value\":\"108\"},{\"type\":\"UInt8\",\"value\":\"78\"},{\"type\":\"UInt8\",\"value\":\"23\"},{\"type\":\"UInt8\",\"value\":\"216\"},{\"type\":\"UInt8\",\"value\":\"31\"},{\"type\":\"UInt8\",\"value\":\"21\"},{\"type\":\"UInt8\",\"value\":\"116\"},{\"type\":\"UInt8\",\"value\":\"102\"},{\"type\":\"UInt8\",\"value\":\"172\"},{\"type\":\"UInt8\",\"value\":\"61\"},{\"type\":\"UInt8\",\"value\":\"121\"},{\"type\":\"UInt8\",\"value\":\"59\"},{\"type\":\"UInt8\",\"value\":\"33\"},{\"type\":\"UInt8\",\"value\":\"127\"},{\"type\":\"UInt8\",\"value\":\"208\"},{\"type\":\"UInt8\",\"value\":\"145\"},{\"type\":\"UInt8\",\"value\":\"232\"},{\"type\":\"UInt8\",\"value\":\"154\"},{\"type\":\"UInt8\",\"value\":\"23\"},{\"type\":\"UInt8\",\"value\":\"43\"},{\"type\":\"UInt8\",\"value\":\"17\"},{\"type\":\"UInt8\",\"value\":\"202\"},{\"type\":\"UInt8\",\"value\":\"200\"},{\"type\":\"UInt8\",\"value\":\"29\"},{\"type\":\"UInt8\",\"value\":\"35\"},{\"type\":\"UInt8\",\"value\":\"120\"},{\"type\":\"UInt8\",\"value\":\"56\"},{\"type\":\"UInt8\",\"value\":\"91\"}]}},{\"name\":\"signatureAlgorithm\",\"value\":{\"type\":\"Enum\",\"value\":{\"id\":\"SignatureAlgorithm\",\"fields\":[{\"name\":\"rawValue\",\"value\":{\"type\":\"UInt8\",\"value\":\"1\"}}]}}},{\"name\":\"isValid\",\"value\":{\"type\":\"Bool\",\"value\":true}}]}}}]}}\n",
+    @transaction_id="eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326",
+    @transaction_index=1,
+    @type="flow.AccountKeyAdded">],
+ @status=:SEALED,
+ @status_code=0>
 ```
 
 
 ### Get Events
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Retrieve events by a given type in a specified block height range or through a list of block IDs.
 
@@ -229,7 +280,7 @@ Example output:
 ```
 
 ### Get Collections
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Retrieve a batch of transactions that have been included in the same block, known as ***collections***. 
 Collections are used to improve consensus throughput by increasing the number of transactions per block and they act as a link between a block and a transaction.
@@ -238,16 +289,15 @@ Collections are used to improve consensus throughput by increasing the number of
 
 Example retrieving a collection:
 ```ruby
-# cid = "..."
-client.get_collection_by_id(cid)
+client.get_collection_by_id("f2a15028f4502c088d5460f1f086b65c0a71bb3da44bde6c6c5dcce254ddf849")
 ```
 Example output:
-```bash
-// TODO collection example
+```ruby
+#<FlowClient::Collection:0x00007f9bf4239280 @id="f2a15028f4502c088d5460f1f086b65c0a71bb3da44bde6c6c5dcce254ddf849", @transaction_ids=["eee1fe5350ea47f0f88b2b742d9487f48026b97f3983b6fd4c7b03ced888d326"]>
 ```
 
 ### Execute Scripts
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Scripts allow you to write arbitrary non-mutating Cadence code on the Flow blockchain and return data. You can learn more about [Cadence and scripts here](https://docs.onflow.org/cadence/language/), but we are now only interested in executing the script code and getting back the data.
 
@@ -293,13 +343,13 @@ script = %{
   }
 }
 
-args = [{ type: 'String', value: "Holy Batman" }.to_json]
+args = [FlowClient::CadenceType.String("Holy Batman")]
 res = client.execute_script(script, args)
 ```
 
 Example output:
-```bash
-// TODO example output
+```ruby
+#<OpenStruct type="Struct", value=#<OpenStruct id="s.a3148d06a181c20c6fb1f92eda0b7b9565386e117d944c2583d0195d56debabf.User", fields=[#<OpenStruct name="balance", value=#<OpenStruct type="UFix64", value="10.00000000">>, #<OpenStruct name="address", value=#<OpenStruct type="Address", value="0x0000000000000001">>, #<OpenStruct name="name", value=#<OpenStruct type="String", value="Holy Batman">>]>>
 ```
 
 ## Mutate Flow Network
@@ -360,7 +410,7 @@ A transaction will be rejected if it is submitted past its expiry block. Flow ca
 A transaction expires after `600` blocks are committed on top of the reference block, which takes about 10 minutes at average Mainnet block rates.
 
 ### Build Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Building a transaction involves setting the required properties explained above and producing a transaction object. 
 
@@ -381,7 +431,6 @@ transaction(greeting: String) {
 }
 ```
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">]()** // TODO example link
 ```ruby
 cadence = %{
   transaction(greeting: String) {
@@ -398,7 +447,7 @@ cadence = %{
   }
 }
 
-arguments = [{ type: "String", value: "Hello world!" }.to_json]
+arguments = [FlowClient::CadenceType.String("Hello World!")]
 
 transaction = FlowClient::Transaction.new
 transaction.script = cadence
@@ -410,7 +459,7 @@ transaction.arguments = arguments
 After you have successfully [built a transaction](#build-transactions) the next step in the process is to sign it.
 
 ### Sign Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO specs here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Flow introduces new concepts that allow for more flexibility when creating and signing transactions.
 Before trying the examples below, we recommend that you read through the [transaction signature documentation](https://docs.onflow.org/concepts/accounts-and-keys/).
@@ -419,7 +468,7 @@ After you have successfully [built a transaction](#build-transactions) the next 
 
 Quick example of building a transaction:
 ```ruby
-arguments = [{ type: "String", value: "Hello world!" }.to_json]
+arguments = [FlowClient::CadenceType.String("Hello world!")]
 
 transaction = FlowClient::Transaction.new
 transaction.script = cadence
@@ -452,31 +501,21 @@ Flow supports great flexibility when it comes to transaction signing, we can def
 | ------- | ------ | ------ |
 | `0x01`  | 1      | 1.0    |
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">](https://github.com/onflow/flow-go-sdk/tree/master/examples#single-party-single-signature)**
 ```ruby
-account = client.get_account("f8d6e0586b0a20c7")
-
-arguments = [{ type: "String", value: "Hello world!" }.to_json]
+account = FlowClient::Account.new(address: 0x01)
 
 transaction = FlowClient::Transaction.new
-transaction.script = script
 transaction.reference_block_id = client.get_latest_block.id
 transaction.gas_limit = 100
 transaction.proposer_address = account.address
 transaction.proposer_key_index = account.keys.first.index
-transaction.arguments = arguments
 transaction.proposer_key_sequence_number = account.keys.first.sequence_number
-transaction.payer_address = ccount.address
-transaction.authorizer_addresses = [ccount.address]
+transaction.payer_address = account.address
+transaction.authorizer_addresses = [account.address]
 
 # Only the envelope needs to be signed in this special case
-signer = FlowClient::LocalSigner.new("4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f")
+signer = FlowClient::LocalSigner.new("<private key hex>")
 transaction.add_envelope_signature(account.address, account.keys.first.index, signer)
-
-tx = client.send_transaction(transaction)
-client.wait_for_transaction(tx.id.unpack1("H*")) do |result|
-  puts result.inspect
-end
 ```
 
 
@@ -491,9 +530,21 @@ end
 | `0x01`  | 1      | 0.5    |
 | `0x01`  | 2      | 0.5    |
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">](https://github.com/onflow/flow-go-sdk/tree/master/examples#single-party-multiple-signatures)**
-```
-// TODO example
+```ruby
+account = FlowClient::Account.new(address: 0x01)
+
+transaction = FlowClient::Transaction.new
+transaction.reference_block_id = client.get_latest_block.id
+transaction.gas_limit = 100
+transaction.proposer_address = account.address
+transaction.proposer_key_index = account.keys.first.index
+transaction.proposer_key_sequence_number = account.keys.first.sequence_number
+transaction.payer_address = account.address
+transaction.authorizer_addresses = [account.address]
+
+signer = FlowClient::LocalSigner.new("<private key hex>")
+transaction.add_envelope_signature(account.address, account.keys[0].index, signer)
+transaction.add_envelope_signature(account.address, account.keys[1].index, signer)
 ```
 
 ### [Multiple parties](https://docs.onflow.org/concepts/transaction-signing/#multiple-parties)
@@ -509,9 +560,26 @@ end
 | `0x01`  | 1      | 1.0    |
 | `0x02`  | 3      | 1.0    |
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">](https://github.com/onflow/flow-go-sdk/tree/master/examples#multiple-parties)**
-```
-// TODO example
+```ruby
+payer_signer = FlowClient::LocalSigner.new("<private key hex>")
+payer_account = FlowClient::Account.new(address: 0x02)
+
+proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
+proposer_account = FlowClient::Account.new(address: 0x01)
+
+@transaction = FlowClient::Transaction.new
+@transaction.reference_block_id = client.get_latest_block.id
+@transaction.gas_limit = gas_limit
+
+@transaction.proposer_address = proposer_account.address
+@transaction.proposer_key_index = proposer_account.keys[0].index
+@transaction.proposer_key_sequence_number = proposer_account.keys[0].sequence_number
+
+@transaction.payer_address = payer_account.address
+@transaction.authorizer_addresses = [proposer_account.address]
+
+@transaction.add_payload_signature(proposer_account.address, proposer_account.keys[0].index, proposer_signer)
+@transaction.add_envelope_signature(payer_account.address, payer_account.keys[2].index, payer_signer)
 ```
 
 ### [Multiple parties, two authorizers](https://docs.onflow.org/concepts/transaction-signing/#multiple-parties)
@@ -528,9 +596,26 @@ end
 | `0x01`  | 1      | 1.0    |
 | `0x02`  | 3      | 1.0    |
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">](https://github.com/onflow/flow-go-sdk/tree/master/examples#multiple-parties-two-authorizers)**
-```
-// TODO example
+```ruby
+payer_signer = FlowClient::LocalSigner.new("<private key hex>")
+payer_account = FlowClient::Account.new(address: 0x02)
+
+proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
+proposer_account = FlowClient::Account.new(address: 0x01)
+
+@transaction = FlowClient::Transaction.new
+@transaction.reference_block_id = client.get_latest_block.id
+@transaction.gas_limit = gas_limit
+
+@transaction.proposer_address = proposer_account.address
+@transaction.proposer_key_index = proposer_account.keys[0].index
+@transaction.proposer_key_sequence_number = proposer_account.keys[0].sequence_number
+
+@transaction.payer_address = payer_account.address
+@transaction.authorizer_addresses = [proposer_account.address, payer_account.address]
+
+@transaction.add_payload_signature(proposer_account.address, proposer_account.keys[0].index, proposer_signer)
+@transaction.add_envelope_signature(payer_account.address, payer_account.keys[2].index, payer_signer)
 ```
 
 ### [Multiple parties, multiple signatures](https://docs.onflow.org/concepts/transaction-signing/#multiple-parties)
@@ -549,26 +634,47 @@ end
 | `0x02`  | 3      | 0.5    |
 | `0x02`  | 4      | 0.5    |
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">]()** // TODO example link
-```
-// TODO example
+```ruby
+payer_signer = FlowClient::LocalSigner.new("<private key hex>")
+payer_account = FlowClient::Account.new(address: 0x02)
+
+proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
+proposer_account = FlowClient::Account.new(address: 0x01)
+
+@transaction = FlowClient::Transaction.new
+@transaction.reference_block_id = client.get_latest_block.id
+
+@transaction.proposer_address = proposer_account.address
+@transaction.proposer_key_index = proposer_account.keys[0].index
+@transaction.proposer_key_sequence_number = proposer_account.keys[0].sequence_number
+
+@transaction.payer_address = payer_account.address
+@transaction.authorizer_addresses = [proposer_account.address]
+
+@transaction.add_payload_signature(proposer_account.address, proposer_account.keys[0].index, proposer_signer)
+@transaction.add_payload_signature(proposer_account.address, proposer_account.keys[1].index, proposer_signer)
+
+@transaction.add_envelope_signature(payer_account.address, payer_account.keys[2].index, payer_signer)
+@transaction.add_envelope_signature(payer_account.address, payer_account.keys[3].index, payer_signer)
 ```
 
 
 ### Send Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO reference here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 After a transaction has been [built](#build-transactions) and [signed](#sign-transactions), it can be sent to the Flow blockchain where it will be executed. If sending was successful you can then [retrieve the transaction result](#get-transactions).
 
 
-**[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/try.svg" width="130">]()** // TODO example here
-```
-// TODO send transaction example
+```ruby
+tx_res = client.send_transaction(@transaction)
+client.wait_for_transaction(tx_res.id.unpack1("H*")) do |response|
+  expect(response.status_code).to eq(0)
+end
 ```
 
 
 ### Create Accounts
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO reference here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 On Flow, account creation happens inside a transaction. Because the network allows for a many-to-many relationship between public keys and accounts, it's not possible to derive a new account address from a public key offline. 
 
@@ -592,19 +698,34 @@ An account key contains the following data:
 Account creation happens inside a transaction, which means that somebody must pay to submit that transaction to the network. We'll call this person the account creator. Make sure you have read [sending a transaction section](#send-transactions) first. 
 
 ```ruby
-client.create_account
+# The account that will pay for the creation of the new account
+account = FlowClient::Account.new(address: "f8d6e0586b0a20c7")
+# Create an in-memory signer with the payer's private key
+signer = FlowClient::LocalSigner.new("4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f")
+# Generate a public key for the new account
+_private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
+# Create the account
+res = client.create_account(public_key, account, signer)
 ```
+
+```ruby
+#<FlowClient::Account:0x00007f84eb36b650
+ @address="01cf0e2f2f715450",
+ @balance=0.001,
+ @contracts={},
+ @keys=[#<FlowClient::AccountKey:0x00007f84eb36b448 @hash_algo="SHA3-256", @index=0, @public_key="6f489d349fee5a0436cac0605820429907b05eb772c194ebf429d71caee70d2b2499be9e6c4e17d81f157466ac3d793b217fd091e89a172b11cac81d2378385b", @revoked=false, @sequence_number=0, @weight=1000>]>
+ ```
 
 After the account creation transaction has been submitted you can retrieve the new account address by [getting the transaction result](#get-transactions). 
 
 The new account address will be emitted in a system-level `flow.AccountCreated` event.
 
-```
-// TODO get new account address
+```ruby
+res.address
 ```
 
 ### Generate Keys
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">]() // TODO reference here
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
 
 Flow uses [ECDSA](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) signatures to control access to user accounts. Each key pair can be used in combination with the `SHA2-256` or `SHA3-256` hashing algorithms.
 

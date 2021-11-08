@@ -155,4 +155,22 @@ module FlowClient
       Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")
     end
   end
+
+  class TransactionResult
+    attr_accessor :status,
+                  :status_code,
+                  :error_message,
+                  :events,
+                  :block_id
+
+    def self.parse_grpc_type(type)
+      result = TransactionResult.new
+      result.block_id = type.block_id.unpack1("H*")
+      result.status = type.status
+      result.status_code = type.status_code
+      result.error_message = type.error_message
+      result.events = type.events.to_a.map { |event| FlowClient::Event.parse_grpc_type(event) }
+      result
+    end
+  end
 end

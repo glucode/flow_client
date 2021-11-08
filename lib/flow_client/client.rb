@@ -58,15 +58,20 @@ module FlowClient
       end
     end
 
-    # Create a new account
-    def create_account(public_key_hex, payer_account, signer)
+    # Creates a new account
+    #
+    # 
+    def create_account(new_account_public_key, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "create-account.cdc"))
 
       arguments = [
+        # CadenceType.Array(
+        #   [CadenceType.String(new_account_public_key)]
+        # ),
         {
           type: "Array",
           value: [
-            { type: "String", value: public_key_hex }
+            { type: "String", value: new_account_public_key }
           ]
         }.to_json,
         {
@@ -238,7 +243,7 @@ module FlowClient
         script: FlowClient::Utils.substitute_address_aliases(script, @address_aliases),
         arguments: processed_args
       )
-      
+
       res = @stub.execute_script_at_latest_block(req)
       parse_json(res.value)
     end
@@ -324,7 +329,14 @@ module FlowClient
       req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
       )
-      @stub.get_transaction_result(req)
+
+      begin
+        res = @stub.get_transaction_result(req)
+      rescue GRPC::BadStatus => e
+        raise ClientError, e.details
+      else
+        TransactionResult.parse_grpc_type(res)
+      end
     end
 
     def wait_for_transaction(transaction_id)

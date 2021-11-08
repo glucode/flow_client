@@ -149,7 +149,7 @@ RSpec.describe FlowClient::Client do
         }
       }
       
-      args = [FlowClient.Int(1)]
+      args = [FlowClient::CadenceType.Int(1)]
       res = client.execute_script(script, args)
 
       expect(res.type).to eq("Int")
