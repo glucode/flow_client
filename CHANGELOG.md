@@ -8,7 +8,7 @@
 
 - Initial release
 
-## [0.2.0] - 2021-10-24
+## [0.2.0] - 2021-11-08
 
 - Added multiple signature support
 - Added multi-party signing
