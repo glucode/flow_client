@@ -168,9 +168,6 @@ Example output:
  @payer_address="8940baba1178d9ab",
  @payload_signatures=[],
  @proposal_key=#<FlowClient::ProposalKey:0x00007fad65acfd18 @address="8940baba1178d9ab", @key_id=0, @sequence_number=135>,
- @proposer_address=nil,
- @proposer_key_index=0,
- @proposer_key_sequence_number=0,
  @reference_block_id="8f483b7c18ca1f52ee55777b612b61dfbd2f07584db9209b1441d6fbdf31fc51",
  @script=
   "import NonFungibleToken from 0x631e88ae7f1d7c20\nimport SturdyItems from 0xfafb022e4e45634b\n\n// This transaction configures an account to hold Sturdy Items.\n\ntransaction {\n    prepare(signer: AuthAccount) {\n    \n   \t\tlog(\"Hello, World!\")\n        log(signer.address)\n        // if the account doesn't already have a collection\n        if signer.borrow<&SturdyItems.Collection>(from: SturdyItems.CollectionStoragePath) == nil {\n\n            // create a new empty collection\n            let collection <- SturdyItems.createEmptyCollection()\n            \n            // save it to the account\n            signer.save(<-collection, to: SturdyItems.CollectionStoragePath)\n\n            // create a public capability for the collection\n            signer.link<&SturdyItems.Collection{NonFungibleToken.CollectionPublic, SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath, target: SturdyItems.CollectionStoragePath)\n        }\n    }\n}",
