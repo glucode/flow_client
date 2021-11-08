@@ -1,10 +1,10 @@
 <br />
 <div align="center">
-  <a href="">
+  <a href="https://github.com/glucode/flow_client">
     <img src="./logo@2x.png" alt="Logo" width="300" height="auto">
   </a>
   <p align="center"> <br />
-    <a href=""><strong>View on GitHub »</strong></a> <br /><br />
+    <a href="https://github.com/glucode/flow_client"><strong>View on GitHub »</strong></a> <br /><br />
     <a href="https://docs.onflow.org/sdk-guidelines/">SDK Specifications</a> ·
     <a href="https://github.com/glucode/flow_client">Contribute</a> ·
     <a href="https://github.com/glucode/flow_client">Report a Bug</a>
