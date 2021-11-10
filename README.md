@@ -700,13 +700,13 @@ Account creation happens inside a transaction, which means that somebody must pa
 
 ```ruby
 # The account that will pay for the creation of the new account
-account = FlowClient::Account.new(address: "f8d6e0586b0a20c7")
+payer_account = client.get_account("f8d6e0586b0a20c7")
 # Create an in-memory signer with the payer's private key
 signer = FlowClient::LocalSigner.new("4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f")
 # Generate a public key for the new account
 _private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
 # Create the account
-res = client.create_account([public_key], { "ContractName": "<contract cadence code>" }, account, signer)
+res = client.create_account([public_key], { "ContractName": "<contract cadence code>" }, payer_account, signer)
 ```
 
 ```ruby
