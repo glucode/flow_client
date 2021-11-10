@@ -2,14 +2,6 @@ require "ostruct"
 
 module FlowClient
   module CadenceType
-    # class CadenceType
-    #   def to_json
-    #   end
-    # end
-
-    # class String
-    # end
-
     def self.String(value)
       OpenStruct.new(type: "String", value: value.to_s)
     end
@@ -147,11 +139,11 @@ module FlowClient
 
     def self.Capability(path, address, borrow_type)
       OpenStruct.new(
-        type: "Type",
+        type: "Capability",
         value: OpenStruct.new(
           path: path.to_s,
           address: address.to_s,
-          borrow_type: borrow_type.to_s
+          borrowType: borrow_type.to_s
         )
       )
     end

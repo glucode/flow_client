@@ -38,8 +38,6 @@ RSpec.describe FlowClient::CadenceType do
       it { expect(value.type).to eq("Optional") }
       it { expect(value.value).to eq(nil) }
     end
-
-
   end
 
   context "Array" do
@@ -176,5 +174,89 @@ RSpec.describe FlowClient::CadenceType do
 
     it { expect(CadenceType.UFix64(64.01).deep_to_h.to_json).to eq(json) }
     it { expect(CadenceType.UFix64("64.01").deep_to_h.to_json).to eq(json) }
+  end
+
+  context "Address" do
+    let(:json) do
+      {
+        type: "Address",
+        value: "0x123"
+      }.to_json
+    end
+
+    it { expect(CadenceType.Address("0x123").deep_to_h.to_json).to eq(json) }
+  end
+
+  context "Void" do
+    let(:json) do
+      {
+        type: "Void",
+      }.to_json
+    end
+
+    it { expect(CadenceType.Void().deep_to_h.to_json).to eq(json) }
+  end
+
+  context "Bool" do
+    let(:true_json) do
+      {
+        type: "Bool",
+        value: true
+      }.to_json
+    end
+
+    let(:false_json) do
+      {
+        type: "Bool",
+        value: false
+      }.to_json
+    end
+
+    it { expect(CadenceType.Bool(true).deep_to_h.to_json).to eq(true_json) }
+    it { expect(CadenceType.Bool("true").deep_to_h.to_json).to eq(true_json) }
+    it { expect(CadenceType.Bool(false).deep_to_h.to_json).to eq(false_json) }
+    it { expect(CadenceType.Bool("false").deep_to_h.to_json).to eq(false_json) }
+  end
+
+  context "Path" do
+    domains = ["storage", "private", "public"]
+
+    domains.each do |domain|
+      json = {
+        type: "Path",
+        value: {
+          domain: domain.to_s,
+          identifier: "flowTokenVault"
+        }
+      }.to_json
+  
+      it { expect(CadenceType.Path(domain, "flowTokenVault").deep_to_h.to_json).to eq(json) }
+    end
+  end
+
+  context "Capability" do
+    json = {
+      "type": "Capability",
+      "value": {
+        "path": "/public/someInteger",
+        "address": "0x1",
+        "borrowType": "Int",
+      }
+    }.to_json
+
+    it { expect(CadenceType.Capability("/public/someInteger", "0x1", "Int").deep_to_h.to_json).to eq(json) }
+  end
+
+  context "Type" do
+    it "" do 
+      json = {
+        "type": "Type",
+        "value": {
+          "staticType": "Int"
+        }
+      }.to_json
+
+      expect(CadenceType.Type("Int").deep_to_h.to_json).to eq(json)
+    end
   end
 end
