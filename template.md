@@ -478,7 +478,7 @@ Signatures can be generated more securely using keys stored in a hardware device
 
 Simple signature example:
 ```ruby
-account = FlowClient::Account.new(address: 0x01)
+account = client.get_account("0x01")
 signer = FlowClient::LocalSigner.new("<private key hex>")
 
 transaction.proposer_address = account.address
@@ -532,7 +532,7 @@ transaction.add_envelope_signature(account.address, account.keys.first.index, si
 | `0x01`  | 2      | 0.5    |
 
 ```ruby
-account = FlowClient::Account.new(address: 0x01)
+account = client.get_account("0x01")
 
 transaction = FlowClient::Transaction.new
 transaction.reference_block_id = client.get_latest_block.id
@@ -563,10 +563,10 @@ transaction.add_envelope_signature(account.address, account.keys[1].index, signe
 
 ```ruby
 payer_signer = FlowClient::LocalSigner.new("<private key hex>")
-payer_account = FlowClient::Account.new(address: 0x02)
+payer_account = client.get_account("0x02")
 
 proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
-proposer_account = FlowClient::Account.new(address: 0x01)
+proposer_account = client.get_account("0x01")
 
 @transaction = FlowClient::Transaction.new
 @transaction.reference_block_id = client.get_latest_block.id
@@ -599,10 +599,10 @@ proposer_account = FlowClient::Account.new(address: 0x01)
 
 ```ruby
 payer_signer = FlowClient::LocalSigner.new("<private key hex>")
-payer_account = FlowClient::Account.new(address: 0x02)
+payer_account = client.get_account("0x02")
 
 proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
-proposer_account = FlowClient::Account.new(address: 0x01)
+proposer_account = client.get_account("0x01")
 
 @transaction = FlowClient::Transaction.new
 @transaction.reference_block_id = client.get_latest_block.id
@@ -637,10 +637,10 @@ proposer_account = FlowClient::Account.new(address: 0x01)
 
 ```ruby
 payer_signer = FlowClient::LocalSigner.new("<private key hex>")
-payer_account = FlowClient::Account.new(address: 0x02)
+payer_account = client.get_account("0x02")
 
 proposer_signer = FlowClient::LocalSigner.new("<private key hex>")
-proposer_account = FlowClient::Account.new(address: 0x01)
+proposer_account = client.get_account("0x01")
 
 @transaction = FlowClient::Transaction.new
 @transaction.reference_block_id = client.get_latest_block.id
