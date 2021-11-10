@@ -36,7 +36,7 @@ RSpec.describe FlowClient::Transaction do
     it { expect(@transaction.script).to eq("") }
     it { expect(@transaction.arguments).to eq([]) }
     it { expect(@transaction.reference_block_id).to eq(nil) }
-    it { expect(@transaction.gas_limit).to eq(0) }
+    it { expect(@transaction.gas_limit).to eq(999) }
     it { expect(@transaction.proposal_key.address).to eq(nil) }
     it { expect(@transaction.proposal_key.key_id).to eq(nil) }
     it { expect(@transaction.proposal_key.sequence_number).to eq(nil) }
