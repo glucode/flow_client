@@ -26,7 +26,7 @@ module FlowClient
       @authorizer_addresses = []
       @arguments = []
       @script = ""
-      @gas_limit = 0
+      @gas_limit = 999
       @envelope_signatures = []
       @payload_signatures = []
       @address_aliases = {}
