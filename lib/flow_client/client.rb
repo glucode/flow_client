@@ -26,9 +26,12 @@ module FlowClient
       @stub.ping(req)
     end
 
-    # Accounts
+    # :section: Accounts
 
-    # Gets an account
+    # Returns an account for the address specified at the latest
+    # block.
+    #
+    # @return [FlowClient::Account] the account 
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
 
@@ -53,14 +56,13 @@ module FlowClient
         end
 
         account.contracts = res.account.contracts
-
         account
       end
     end
 
     # Creates a new account
     #
-    # 
+    # @return [FlowClient::Account] the newly created account 
     def create_account(new_account_public_keys, contracts, payer_account, signer)
       script = File.read(File.join("lib", "cadence", "templates", "create-account.cdc"))
 
@@ -105,14 +107,8 @@ module FlowClient
       script = File.read(File.join("lib", "cadence", "templates", "add-account-key.cdc"))
 
       arguments = [
-        {
-          type: "String",
-          value: public_key_hex
-        }.to_json,
-        {
-          type: "UFix64",
-          value: weight.to_s
-        }.to_json
+        CadenceType.String(public_key_hex),
+        CadenceType.UFix64(weight)
       ]
 
       transaction = FlowClient::Transaction.new
@@ -138,14 +134,8 @@ module FlowClient
       code_hex = code.unpack1("H*")
 
       arguments = [
-        {
-          type: "String",
-          value: name
-        }.to_json,
-        {
-          type: "String",
-          value: code_hex
-        }.to_json
+        CadenceType.String(name),
+        CadenceType.String(code_hex)
       ]
 
       transaction = FlowClient::Transaction.new
@@ -170,10 +160,7 @@ module FlowClient
       script = File.read(File.join("lib", "cadence", "templates", "remove-contract.cdc"))
 
       arguments = [
-        {
-          type: "String",
-          value: name
-        }.to_json
+        CadenceType.String(name),
       ]
 
       transaction = FlowClient::Transaction.new
@@ -199,14 +186,8 @@ module FlowClient
       code_hex = code.unpack1("H*")
 
       arguments = [
-        {
-          type: "String",
-          value: name
-        }.to_json,
-        {
-          type: "String",
-          value: code_hex
-        }.to_json
+        CadenceType.String(name),
+        CadenceType.String(code_hex)
       ]
 
       transaction = FlowClient::Transaction.new
@@ -226,7 +207,9 @@ module FlowClient
       end
     end
 
-    # Scripts
+    # :section: Scripts
+
+    # Executes a script on the blockchain
     def execute_script(script, args = [])
       processed_args = []
       args.to_a.each do |arg|

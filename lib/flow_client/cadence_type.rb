@@ -35,111 +35,87 @@ module FlowClient
     end
 
     def self.UInt(value)
-      OpenStruct.new(type: "UInt", value: value.to_i)
+      OpenStruct.new(type: "UInt", value: value.to_s)
     end
 
     def self.Int8(value)
-      OpenStruct.new(type: "Int8", value: value.to_i)
+      OpenStruct.new(type: "Int8", value: value.to_s)
     end
 
     def self.UInt8(value)
-      OpenStruct.new(type: "UInt8", value: value.to_i)
+      OpenStruct.new(type: "UInt8", value: value.to_s)
     end
 
     def self.Int16(value)
-      OpenStruct.new(type: "Int16", value: value.to_i)
+      OpenStruct.new(type: "Int16", value: value.to_s)
     end
 
     def self.UInt16(value)
-      OpenStruct.new(type: "UInt16", value: value.to_i)
+      OpenStruct.new(type: "UInt16", value: value.to_s)
     end
 
     def self.Int32(value)
-      OpenStruct.new(type: "Int32", value: value.to_i)
+      OpenStruct.new(type: "Int32", value: value.to_s)
     end
 
     def self.UInt32(value)
-      OpenStruct.new(type: "UInt32", value: value.to_i)
+      OpenStruct.new(type: "UInt32", value: value.to_s)
     end
 
     def self.Int64(value)
-      OpenStruct.new(type: "Int64", value: value.to_i)
+      OpenStruct.new(type: "Int64", value: value.to_s)
     end
 
     def self.UInt64(value)
-      OpenStruct.new(type: "UInt64", value: value.to_i)
+      OpenStruct.new(type: "UInt64", value: value.to_s)
     end
 
     def self.Int64(value)
-      OpenStruct.new(type: "Int64", value: value.to_i)
+      OpenStruct.new(type: "Int64", value: value.to_s)
     end
 
     def self.UInt64(value)
-      OpenStruct.new(type: "UInt64", value: value.to_i)
+      OpenStruct.new(type: "UInt64", value: value.to_s)
     end
 
     def self.Int128(value)
-      OpenStruct.new(type: "Int128", value: value.to_i)
+      OpenStruct.new(type: "Int128", value: value.to_s)
     end
 
     def self.UInt128(value)
-      OpenStruct.new(type: "UInt128", value: value.to_i)
+      OpenStruct.new(type: "UInt128", value: value.to_s)
     end
 
     def self.Int256(value)
-      OpenStruct.new(type: "Int256", value: value.to_i)
+      OpenStruct.new(type: "Int256", value: value.to_s)
     end
 
     def self.UInt256(value)
-      OpenStruct.new(type: "UInt256", value: value.to_i)
+      OpenStruct.new(type: "UInt256", value: value.to_s)
     end
 
     def self.Word8(value)
-      OpenStruct.new(type: "Word8", value: value.to_i)
-    end
-
-    def self.Word8(value)
-      OpenStruct.new(type: "Word8", value: value.to_i)
+      OpenStruct.new(type: "Word8", value: value.to_s)
     end
 
     def self.Word16(value)
-      OpenStruct.new(type: "Word16", value: value.to_i)
-    end
-
-    def self.Word16(value)
-      OpenStruct.new(type: "Word16", value: value.to_i)
+      OpenStruct.new(type: "Word16", value: value.to_s)
     end
 
     def self.Word32(value)
-      OpenStruct.new(type: "Word32", value: value.to_i)
-    end
-
-    def self.Word32(value)
-      OpenStruct.new(type: "Word32", value: value.to_i)
+      OpenStruct.new(type: "Word32", value: value.to_s)
     end
 
     def self.Word64(value)
-      OpenStruct.new(type: "Word64", value: value.to_i)
-    end
-
-    def self.Word64(value)
-      OpenStruct.new(type: "Word64", value: value.to_i)
+      OpenStruct.new(type: "Word64", value: value.to_s)
     end
 
     def self.Fix64(value)
-      OpenStruct.new(type: "Fix64", value: value.to_i)
-    end
-
-    def self.Fix64(value)
-      OpenStruct.new(type: "Fix64", value: value.to_i)
+      OpenStruct.new(type: "Fix64", value: value.to_s)
     end
 
     def self.UFix64(value)
-      OpenStruct.new(type: "Fix64", value: value.to_i)
-    end
-
-    def self.UFix64(value)
-      OpenStruct.new(type: "Fix64", value: value.to_i)
+      OpenStruct.new(type: "UFix64", value: value.to_s)
     end
 
     def self.Array(values)
