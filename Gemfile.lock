@@ -16,14 +16,10 @@ GEM
     diff-lcs (1.4.4)
     ffi (1.15.4)
     formatador (0.3.0)
-    google-protobuf (3.19.1-x86_64-darwin)
-    google-protobuf (3.19.1-x86_64-linux)
+    google-protobuf (3.19.1)
     googleapis-common-protos-types (1.3.0)
       google-protobuf (~> 3.14)
-    grpc (1.41.0-universal-darwin)
-      google-protobuf (~> 3.17)
-      googleapis-common-protos-types (~> 1.0)
-    grpc (1.41.0-x86_64-linux)
+    grpc (1.41.0)
       google-protobuf (~> 3.17)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.41.0)
@@ -98,6 +94,7 @@ GEM
     unicode-display_width (2.1.0)
 
 PLATFORMS
+  ruby
   x86_64-darwin-20
   x86_64-linux
 
