@@ -57,51 +57,6 @@ module FlowClient
       Utils.right_pad_bytes(TRANSACTION_DOMAIN_TAG.bytes, 32).pack("c*")
     end
 
-    def payload_canonical_form
-      [
-        resolved_script, @arguments,
-        [@reference_block_id].pack("H*"), @gas_limit,
-        padded_address(@proposal_key.address), @proposal_key.key_id,
-        @proposal_key.sequence_number, padded_address(@payer_address),
-        @authorizer_addresses.map { |address| padded_address(address) }
-      ]
-    end
-
-    def payload_message
-      payload = payload_canonical_form
-      RLP.encode(payload)
-    end
-
-    def envelope_canonical_form
-      @signers[@proposal_key.address] = 0
-
-      @payload_signatures.each do |sig|
-        @signers[sig.address] = @signers.keys.count
-      end
-
-      signatures = []
-      @payload_signatures.each do |sig|
-        signatures << [
-          @signers[sig.address.unpack1("H*")],
-          sig.key_id,
-          sig.signature
-        ]
-      end
-
-      [
-        payload_canonical_form,
-        signatures
-      ]
-    end
-
-    def envelope_message
-      RLP.encode(envelope_canonical_form)
-    end
-
-    def payload_message
-      RLP.encode(payload_canonical_form)
-    end
-
     def add_envelope_signature(signer_address, key_index, signer)
       domain_tagged_envelope = (Transaction.padded_transaction_domain_tag.bytes + envelope_message.bytes).pack("C*")
 
@@ -159,6 +114,51 @@ module FlowClient
 
     def padded_address(address_hex_string)
       Utils.left_pad_bytes([address_hex_string].pack("H*").bytes, 8).pack("C*")
+    end
+
+    def payload_canonical_form
+      [
+        resolved_script, @arguments,
+        [@reference_block_id].pack("H*"), @gas_limit,
+        padded_address(@proposal_key.address), @proposal_key.key_id,
+        @proposal_key.sequence_number, padded_address(@payer_address),
+        @authorizer_addresses.map { |address| padded_address(address) }
+      ]
+    end
+
+    def payload_message
+      payload = payload_canonical_form
+      RLP.encode(payload)
+    end
+
+    def envelope_canonical_form
+      @signers[@proposal_key.address] = 0
+
+      @payload_signatures.each do |sig|
+        @signers[sig.address] = @signers.keys.count
+      end
+
+      signatures = []
+      @payload_signatures.each do |sig|
+        signatures << [
+          @signers[sig.address.unpack1("H*")],
+          sig.key_id,
+          sig.signature
+        ]
+      end
+
+      [
+        payload_canonical_form,
+        signatures
+      ]
+    end
+
+    def envelope_message
+      RLP.encode(envelope_canonical_form)
+    end
+
+    def payload_message
+      RLP.encode(payload_canonical_form)
     end
   end
 

@@ -226,7 +226,11 @@ module FlowClient
       parse_json(res.value)
     end
 
-    # Blocks
+    # :section: Blocks
+
+    # Returns the latest block
+    #
+    # @return [FlowClient::Block] the block
     def get_latest_block(is_sealed: true)
       req = Access::GetLatestBlockRequest.new(
         is_sealed: is_sealed
@@ -235,6 +239,9 @@ module FlowClient
       Block.parse_grpc_block_response(res)
     end
 
+    # Returns the block with id
+    #
+    # @return [FlowClient::Block] the block
     def get_block_by_id(id)
       req = Access::GetBlockByIDRequest.new(
         id: to_bytes(id)
@@ -243,6 +250,9 @@ module FlowClient
       Block.parse_grpc_block_response(res)
     end
 
+    # Returns the latest with height
+    #
+    # @return [FlowClient::Block] the block
     def get_block_by_height(height)
       req = Access::GetBlockByHeightRequest.new(
         height: height
@@ -251,7 +261,11 @@ module FlowClient
       Block.parse_grpc_block_response(res)
     end
 
-    # Collections
+    # :section: Collections
+
+    # Returns the collection with id
+    #
+    # @return [FlowClient::Collection] the collection
     def get_collection_by_id(id)
       req = Access::GetCollectionByIDRequest.new(
         id: to_bytes(id)
@@ -260,7 +274,9 @@ module FlowClient
       Collection.parse_grpc_type(res)
     end
 
-    # Events
+    # :section: Events
+
+    # Returns events of the given type between the start and end block heights.
     def get_events(type, start_height, end_height)
       req = Access::GetEventsForHeightRangeRequest.new(
         type: type,
@@ -276,9 +292,11 @@ module FlowClient
       end
     end
 
-    # Transactions
+    # :section: Transactions
 
     # Sends a transaction to the blockchain
+    #
+    # @return [FlowClient::TransactionResponse] the transaction response
     def send_transaction(transaction)
       transaction.address_aliases = @address_aliases
       req = Access::SendTransactionRequest.new(
@@ -294,6 +312,9 @@ module FlowClient
       end
     end
 
+    # Returns the transaction with transaction_id
+    #
+    # @return [FlowClient::Transaction] the transaction
     def get_transaction(transaction_id)
       req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
@@ -309,6 +330,8 @@ module FlowClient
     end
 
     # Returns a transaction result
+    #
+    # @return [FlowClient::TransactionResult] the transaction result
     def get_transaction_result(transaction_id)
       req = Access::GetTransactionRequest.new(
         id: to_bytes(transaction_id)
@@ -323,9 +346,11 @@ module FlowClient
       end
     end
 
+    # Polls the blockchain for the transaction result until it is sealed
+    # or expired
     def wait_for_transaction(transaction_id)
       response = get_transaction_result(transaction_id)
-      while response.status != :SEALED
+      while ![:SEALED, :EXPIRED].include? response.status
         sleep(0.5)
         response = get_transaction_result(transaction_id)
       end
