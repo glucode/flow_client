@@ -669,7 +669,7 @@ After a transaction has been [built](#build-transactions) and [signed](#sign-tra
 ```ruby
 tx_res = client.send_transaction(@transaction)
 client.wait_for_transaction(tx_res.id) do |response|
-  expect(response.status_code).to eq(0)
+  # use response here
 end
 ```
 
