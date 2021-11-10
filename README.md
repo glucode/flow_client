@@ -62,7 +62,7 @@ res = client.ping
 After you have established a connection with an access node, you can query the Flow network to retrieve data about blocks, accounts, events and transactions. We will explore how to retrieve each of these entities in the sections below.
 
 ### Get Blocks
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client)
 
 Query the network for block by id, height or get the latest block.
 
@@ -104,7 +104,7 @@ Result output:
 ```
 
 ### Get Account
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient%2FClient:get_account)
 
 Retrieve any account from Flow network's latest block or from a specified block height.
 
@@ -133,7 +133,7 @@ Result output:
 
 
 ### Get Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#get_transaction-instance_method)
 
 Retrieve transactions from the network by providing a transaction ID. After a transaction has been submitted, you can also get the transaction result to check the status.
 
@@ -233,7 +233,7 @@ Example output:
 
 
 ### Get Events
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#get_events-instance_method)
 
 Retrieve events by a given type in a specified block height range or through a list of block IDs.
 
@@ -277,7 +277,7 @@ Example output:
 ```
 
 ### Get Collections
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#get_collection_by_id-instance_method)
 
 Retrieve a batch of transactions that have been included in the same block, known as ***collections***. 
 Collections are used to improve consensus throughput by increasing the number of transactions per block and they act as a link between a block and a transaction.
@@ -294,7 +294,7 @@ Example output:
 ```
 
 ### Execute Scripts
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#execute_script-instance_method)
 
 Scripts allow you to write arbitrary non-mutating Cadence code on the Flow blockchain and return data. You can learn more about [Cadence and scripts here](https://docs.onflow.org/cadence/language/), but we are now only interested in executing the script code and getting back the data.
 
@@ -407,7 +407,7 @@ A transaction will be rejected if it is submitted past its expiry block. Flow ca
 A transaction expires after `600` blocks are committed on top of the reference block, which takes about 10 minutes at average Mainnet block rates.
 
 ### Build Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Transaction)
 
 Building a transaction involves setting the required properties explained above and producing a transaction object. 
 
@@ -456,7 +456,7 @@ transaction.arguments = arguments
 After you have successfully [built a transaction](#build-transactions) the next step in the process is to sign it.
 
 ### Sign Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Transaction)
 
 Flow introduces new concepts that allow for more flexibility when creating and signing transactions.
 Before trying the examples below, we recommend that you read through the [transaction signature documentation](https://docs.onflow.org/concepts/accounts-and-keys/).
@@ -661,7 +661,7 @@ proposer_account = client.get_account("0x01")
 
 
 ### Send Transactions
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#send_transaction-instance_method)
 
 After a transaction has been [built](#build-transactions) and [signed](#sign-transactions), it can be sent to the Flow blockchain where it will be executed. If sending was successful you can then [retrieve the transaction result](#get-transactions).
 
@@ -675,7 +675,7 @@ end
 
 
 ### Create Accounts
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Client#create_account-instance_method)
 
 On Flow, account creation happens inside a transaction. Because the network allows for a many-to-many relationship between public keys and accounts, it's not possible to derive a new account address from a public key offline. 
 
@@ -726,7 +726,7 @@ res.address
 ```
 
 ### Generate Keys
-[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://github.com/glucode/flow_client)
+[<img src="https://raw.githubusercontent.com/onflow/sdks/main/templates/documentation/ref.svg" width="130">](https://www.rubydoc.info/gems/flow_client/FlowClient/Crypto#generate_key_pair-class_method)
 
 Flow uses [ECDSA](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) signatures to control access to user accounts. Each key pair can be used in combination with the `SHA2-256` or `SHA3-256` hashing algorithms.
 
