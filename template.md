@@ -503,7 +503,7 @@ Flow supports great flexibility when it comes to transaction signing, we can def
 | `0x01`  | 1      | 1.0    |
 
 ```ruby
-account = FlowClient::Account.new(address: 0x01)
+account = client.get_account("0x01")
 
 transaction = FlowClient::Transaction.new
 transaction.reference_block_id = client.get_latest_block.id
