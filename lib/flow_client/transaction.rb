@@ -36,7 +36,7 @@ module FlowClient
 
     def arguments=(arguments)
       arguments.to_a.each do |arg|
-        processed_arg = arg.class == OpenStruct ? Utils.openstruct_to_json(arg) : arg
+        processed_arg = arg.instance_of?(OpenStruct) ? Utils.openstruct_to_json(arg) : arg
         @arguments << processed_arg
       end
     end
