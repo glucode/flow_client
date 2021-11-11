@@ -35,7 +35,7 @@ RSpec.describe FlowClient::Client do
         signer = FlowClient::LocalSigner.new(service_account_private_key)
         payer_account = FlowClient::Account.new(address: service_account_address)
 
-        new_account = client.create_account([@pub_key], { "NonFungibleToken": nft_contract }, payer_account, signer)
+        new_account = client.create_account([@pub_key], { NonFungibleToken: nft_contract }, payer_account, signer)
 
         expect(new_account).to be_an_instance_of(FlowClient::Account)
         expect(new_account.address).not_to be_nil
@@ -145,13 +145,12 @@ RSpec.describe FlowClient::Client do
 
   context "script" do
     it "sends a simple script" do
-      
       script = %{
         pub fun main(a: Int): Int {
           return a + 10
         }
       }
-      
+
       args = [FlowClient::CadenceType.Int(1)]
       res = client.execute_script(script, args)
 

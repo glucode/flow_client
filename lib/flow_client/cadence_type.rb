@@ -1,16 +1,41 @@
+# frozen_string_literal: true
+
 require "ostruct"
 
 module FlowClient
   module CadenceType
+    # Returns an OpenStruct representing a Cadence String type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.String("Hello world!")
+    #
+    # @param [String] the string value
+    #
+    # @returns [OpenStruct] the Cadence String struct
     def self.String(value)
       OpenStruct.new(type: "String", value: value.to_s)
     end
 
+    # Returns an OpenStruct representing a Cadence Optional type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.Optional("Hello world!")
+    #   @arg = FlowClient::CadenceType.Optional()
+    #
+    # @param [String] the string value
+    #
+    # @returns [OpenStruct] the Cadence Optional struct
     def self.Optional(value = nil)
       OpenStruct.new(type: "Optional", value: value)
     end
 
-    def self.Void()
+    # Returns an OpenStruct representing a Cadence Void type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.Void()
+    #
+    # @returns [OpenStruct] the Cadence Void struct
+    def self.Void
       OpenStruct.new(type: "Void")
     end
 
@@ -52,14 +77,6 @@ module FlowClient
 
     def self.UInt32(value)
       OpenStruct.new(type: "UInt32", value: value.to_s)
-    end
-
-    def self.Int64(value)
-      OpenStruct.new(type: "Int64", value: value.to_s)
-    end
-
-    def self.UInt64(value)
-      OpenStruct.new(type: "UInt64", value: value.to_s)
     end
 
     def self.Int64(value)
@@ -123,9 +140,9 @@ module FlowClient
     end
 
     def self.Path(domain, identifier)
-      raise raise ArgumentError.new(
-        "Domain can only be one of storage, private or public"
-      ) unless ["storage", "private", "public"].include? domain.to_s.downcase
+      unless %w[storage private public].include? domain.to_s.downcase
+        raise raise ArgumentError, "Domain can only be one of storage, private or public"
+      end
 
       OpenStruct.new(
         type: "Path",
@@ -149,8 +166,11 @@ module FlowClient
     end
 
     def self.Composite(type, value)
-      valid_types = [:struct, :resource, :event, :contract, :enum]
-      raise ArgumentError.new("incorrect type, expected :struct, :resource, :event, :contract or :enum") unless valid_types.include? type
+      valid_types = %i[struct resource event contract enum]
+      unless valid_types.include? type
+        raise ArgumentError, "incorrect type, expected :struct, :resource, :event, :contract or :enum"
+      end
+
       OpenStruct.new(type: type.to_s.capitalize, value: value)
     end
 

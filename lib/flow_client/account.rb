@@ -24,6 +24,7 @@ module FlowClient
       @keys = keys
       @address = address
       @balance = balance
+      @contracts = contracts
       @contracts = {}
     end
   end

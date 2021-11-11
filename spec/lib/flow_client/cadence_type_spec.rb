@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 include FlowClient
 
 RSpec.describe FlowClient::CadenceType do
@@ -17,7 +18,7 @@ RSpec.describe FlowClient::CadenceType do
           type: "Optional",
           value: [
             { type: "String", value: "One" },
-            { type: "String", value: "Two" },
+            { type: "String", value: "Two" }
           ]
         }.to_json
       end
@@ -41,21 +42,21 @@ RSpec.describe FlowClient::CadenceType do
   end
 
   context "Array" do
-    let(:array) {
+    let(:array) do
       CadenceType.Array(
         [
           CadenceType.String("One"),
           CadenceType.String("Two")
         ]
       )
-    }
+    end
 
     it "converts to json" do
       json = {
         type: "Array",
         value: [
           { type: "String", value: "One" },
-          { type: "String", value: "Two" },
+          { type: "String", value: "Two" }
         ]
       }
 
@@ -90,7 +91,8 @@ RSpec.describe FlowClient::CadenceType do
   end
 
   context "Integers" do
-    types = ["Int", "UInt", "Int8", "UInt8", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Int128", "UInt128", "Int256", "UInt256"]
+    types = %w[Int UInt Int8 UInt8 Int16 UInt16 Int32 UInt32 Int64 UInt64 Int128
+               UInt128 Int256 UInt256]
 
     types.each do |type|
       it "" do
@@ -98,7 +100,7 @@ RSpec.describe FlowClient::CadenceType do
           type: type,
           value: "1"
         }.to_json
-        result = CadenceType.send(type, '1') 
+        result = CadenceType.send(type, "1")
         expect(result.deep_to_h.to_json).to eq(json)
       end
     end
@@ -190,7 +192,7 @@ RSpec.describe FlowClient::CadenceType do
   context "Void" do
     let(:json) do
       {
-        type: "Void",
+        type: "Void"
       }.to_json
     end
 
@@ -219,7 +221,7 @@ RSpec.describe FlowClient::CadenceType do
   end
 
   context "Path" do
-    domains = ["storage", "private", "public"]
+    domains = %w[storage private public]
 
     domains.each do |domain|
       json = {
@@ -229,18 +231,18 @@ RSpec.describe FlowClient::CadenceType do
           identifier: "flowTokenVault"
         }
       }.to_json
-  
+
       it { expect(CadenceType.Path(domain, "flowTokenVault").deep_to_h.to_json).to eq(json) }
     end
   end
 
   context "Capability" do
     json = {
-      "type": "Capability",
-      "value": {
-        "path": "/public/someInteger",
-        "address": "0x1",
-        "borrowType": "Int",
+      type: "Capability",
+      value: {
+        path: "/public/someInteger",
+        address: "0x1",
+        borrowType: "Int"
       }
     }.to_json
 
@@ -248,11 +250,11 @@ RSpec.describe FlowClient::CadenceType do
   end
 
   context "Type" do
-    it "" do 
+    it "" do
       json = {
-        "type": "Type",
-        "value": {
-          "staticType": "Int"
+        type: "Type",
+        value: {
+          staticType: "Int"
         }
       }.to_json
 

@@ -17,6 +17,6 @@ module FlowClient
   require "flow_client/signer"
   require "flow_client/proposal_key"
   require "flow_client/event"
-  require "flow_client/cadence_type.rb"
+  require "flow_client/cadence_type"
   require "flow_client/signature"
 end

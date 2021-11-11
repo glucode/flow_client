@@ -16,8 +16,6 @@ module FlowClient
                   :payer_address,
                   :authorizer_addresses,
                   :address_aliases,
-                  :envelope_signatures,
-                  :payload_signatures,
                   :proposal_key
 
     attr_reader :envelope_signatures, :payload_signatures
@@ -36,7 +34,7 @@ module FlowClient
 
     def arguments=(arguments)
       arguments.to_a.each do |arg|
-        processed_arg = arg.class == OpenStruct ? Utils.openstruct_to_json(arg) : arg
+        processed_arg = arg.instance_of?(OpenStruct) ? Utils.openstruct_to_json(arg) : arg
         @arguments << processed_arg
       end
     end
