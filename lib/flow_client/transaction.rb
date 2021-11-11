@@ -16,8 +16,6 @@ module FlowClient
                   :payer_address,
                   :authorizer_addresses,
                   :address_aliases,
-                  :envelope_signatures,
-                  :payload_signatures,
                   :proposal_key
 
     attr_reader :envelope_signatures, :payload_signatures
