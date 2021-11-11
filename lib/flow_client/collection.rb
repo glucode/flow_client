@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FlowClient
   class Collection
     attr_accessor :id, :transaction_ids

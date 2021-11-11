@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FlowClient
   class Signature
     attr_accessor :address,
