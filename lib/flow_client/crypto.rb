@@ -19,7 +19,7 @@ module FlowClient
     def self.sign(data, private_key_hex, hash_algo = HashAlgos::SHA3_256)
       ssl_key = FlowClient::Crypto.key_from_hex_keys(private_key_hex)
       # TODO: Fix this so that both hashing algos will work
-      asn = ssl_key.dsa_sign_asn1(OpenSSL::Digest.digest("SHA3-256", data))
+      asn = ssl_key.dsa_sign_asn1(OpenSSL::Digest.digest(hash_algo, data))
       r, s = OpenSSL::ASN1.decode(asn).value
       combined_bytes = Utils.left_pad_bytes([r.value.to_s(16)].pack("H*").unpack("C*"), 32) +
                        Utils.left_pad_bytes([s.value.to_s(16)].pack("H*").unpack("C*"), 32)
@@ -46,7 +46,7 @@ module FlowClient
     # Crypto::Curves::SECP256K1
     #
     # The 04 prefix indicating that the public key is uncompressed is stripped.
-    # https://datatracker.ietf.org/doc/html/rfc5480
+    # @see https://datatracker.ietf.org/doc/html/rfc5480
     #
     # Usage example:
     # private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)

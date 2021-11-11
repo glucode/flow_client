@@ -36,7 +36,6 @@ RSpec.describe FlowClient::Block do
         client.wait_for_transaction(tx.id) do |result|
           puts result.inspect
         end
-
       end
 
       # it { expect(block.id).to eq(response.id) }

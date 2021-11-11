@@ -31,6 +31,8 @@ module FlowClient
     # Returns an account for the address specified at the latest
     # block.
     #
+    # @param [String] the address string value
+    #
     # @return [FlowClient::Account] the account 
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))
@@ -252,6 +254,8 @@ module FlowClient
 
     # Returns the latest with height
     #
+    # @param [Integer] block height
+    #
     # @return [FlowClient::Block] the block
     def get_block_by_height(height)
       req = Access::GetBlockByHeightRequest.new(
@@ -265,6 +269,8 @@ module FlowClient
 
     # Returns the collection with id
     #
+    # @param [String] collection id
+    #
     # @return [FlowClient::Collection] the collection
     def get_collection_by_id(id)
       req = Access::GetCollectionByIDRequest.new(
@@ -276,7 +282,13 @@ module FlowClient
 
     # :section: Events
 
-    # Returns events of the given type between the start and end block heights.
+    # Returns events of the given type between the start and end block heights
+    #
+    # @param [String] event name
+    # @param [Integer] start block height
+    # @param [Integer] end block height
+    #
+    # @return [FlowClient::EventsResult] the events response
     def get_events(type, start_height, end_height)
       req = Access::GetEventsForHeightRangeRequest.new(
         type: type,

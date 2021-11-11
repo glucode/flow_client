@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FlowClient
   class EventsResult
     attr_accessor :block_id,
@@ -9,7 +11,7 @@ module FlowClient
       @block_id = nil
       @block_height = nil
       @events = nil
-      @block_timestamp= nil
+      @block_timestamp = nil
     end
 
     def self.parse_grpc_type(type)
@@ -28,7 +30,7 @@ module FlowClient
                   :transaction_index,
                   :event_index,
                   :payload
-                  
+
     def initialize
       @type = nil
       @transaction_id = nil
