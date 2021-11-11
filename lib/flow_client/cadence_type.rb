@@ -2,14 +2,38 @@ require "ostruct"
 
 module FlowClient
   module CadenceType
+
+    # Returns an OpenStruct representing a Cadence String type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.String("Hello world!")
+    #
+    # @param [String] the string value
+    #
+    # @returns [OpenStruct] the Cadence String struct
     def self.String(value)
       OpenStruct.new(type: "String", value: value.to_s)
     end
 
+    # Returns an OpenStruct representing a Cadence Optional type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.Optional("Hello world!")
+    #   @arg = FlowClient::CadenceType.Optional()
+    #
+    # @param [String] the string value
+    #
+    # @returns [OpenStruct] the Cadence Optional struct
     def self.Optional(value = nil)
       OpenStruct.new(type: "Optional", value: value)
     end
 
+    # Returns an OpenStruct representing a Cadence Void type
+    #
+    # @example
+    #   @arg = FlowClient::CadenceType.Void()
+    #
+    # @returns [OpenStruct] the Cadence Void struct
     def self.Void()
       OpenStruct.new(type: "Void")
     end

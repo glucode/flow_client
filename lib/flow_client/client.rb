@@ -31,6 +31,8 @@ module FlowClient
     # Returns an account for the address specified at the latest
     # block.
     #
+    # @param [String] the address string value
+    #
     # @return [FlowClient::Account] the account 
     def get_account(address)
       req = Access::GetAccountAtLatestBlockRequest.new(address: to_bytes(address))

@@ -46,7 +46,7 @@ module FlowClient
     # Crypto::Curves::SECP256K1
     #
     # The 04 prefix indicating that the public key is uncompressed is stripped.
-    # https://datatracker.ietf.org/doc/html/rfc5480
+    # @see https://datatracker.ietf.org/doc/html/rfc5480
     #
     # Usage example:
     # private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
