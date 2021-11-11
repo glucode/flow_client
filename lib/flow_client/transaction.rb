@@ -16,9 +16,9 @@ module FlowClient
                   :payer_address,
                   :authorizer_addresses,
                   :address_aliases,
-                  :proposal_key
-
-    attr_reader :envelope_signatures, :payload_signatures
+                  :proposal_key,
+                  :envelope_signatures,
+                  :payload_signatures
 
     def initialize
       @authorizer_addresses = []
@@ -105,7 +105,7 @@ module FlowClient
     end
 
     protected
-
+    
     def resolved_script
       FlowClient::Utils.substitute_address_aliases(@script, @address_aliases)
     end

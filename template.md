@@ -706,7 +706,7 @@ signer = FlowClient::LocalSigner.new("4d9287571c8bff7482ffc27ef68d5b4990f9bd009a
 # Generate a public key for the new account
 _private_key, public_key = FlowClient::Crypto.generate_key_pair(FlowClient::Crypto::Curves::P256)
 # Create the account
-res = client.create_account([public_key], { "ContractName": "<contract cadence code>" }, payer_account, signer)
+new_account = client.create_account([public_key], { "ContractName": "<contract cadence code>" }, payer_account, signer)
 ```
 
 ```ruby
@@ -722,7 +722,8 @@ After the account creation transaction has been submitted you can retrieve the n
 The new account address will be emitted in a system-level `flow.AccountCreated` event.
 
 ```ruby
-res.address
+new_account = client.create_account([public_key], { "ContractName": "<contract cadence code>" }, payer_account, signer)
+new_account.address
 ```
 
 ### Generate Keys

@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
+require "simplecov"
+SimpleCov.start do
+  add_filter '/spec/'
+
+  add_group 'SomeGroup', '/lib/'
+end
+# SimpleCov.coverage_dir 'public/coverage'
+
 require "flow_client"
+
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

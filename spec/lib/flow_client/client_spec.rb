@@ -8,7 +8,7 @@ RSpec.describe FlowClient::Client do
     "4d9287571c8bff7482ffc27ef68d5b4990f9bd009a1e9fa812aae08ba167d57f"
   end
 
-  describe "ping" do
+  context "ping" do
     it "pings the " do
       expect(client.ping).to be_an_instance_of(Access::PingResponse)
     end
@@ -59,31 +59,31 @@ RSpec.describe FlowClient::Client do
 
         expect(client.get_account(new_account.address).keys.count).to eq(2)
       end
+    end
 
-      describe "contracts" do
-        it "adds, updates and removes a contract" do
-          code = File.read(File.join("lib", "cadence", "contracts", "NonFungibleToken.cdc"))
+    describe "contracts" do
+      it "adds, updates and removes a contract" do
+        code = File.read(File.join("lib", "cadence", "contracts", "NonFungibleToken.cdc"))
 
-          priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
-          _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
+        priv_key_one, pub_key_one = FlowClient::Crypto.generate_key_pair
+        _priv_key_two, pub_key_two = FlowClient::Crypto.generate_key_pair
 
-          signer = FlowClient::LocalSigner.new(service_account_private_key)
-          account = FlowClient::Account.new(address: service_account_address)
+        signer = FlowClient::LocalSigner.new(service_account_private_key)
+        account = FlowClient::Account.new(address: service_account_address)
 
+        client.remove_contract("NonFungibleToken", account, signer)
+
+        expect do
+          client.add_contract("NonFungibleToken", code, account, signer)
+        end.not_to raise_error
+
+        expect do
+          client.update_contract("NonFungibleToken", code, account, signer)
+        end.not_to raise_error
+
+        expect do
           client.remove_contract("NonFungibleToken", account, signer)
-
-          expect do
-            client.add_contract("NonFungibleToken", code, account, signer)
-          end.not_to raise_error
-
-          expect do
-            client.update_contract("NonFungibleToken", code, account, signer)
-          end.not_to raise_error
-
-          expect do
-            client.remove_contract("NonFungibleToken", account, signer)
-          end.not_to raise_error
-        end
+        end.not_to raise_error
       end
     end
   end
@@ -156,6 +156,65 @@ RSpec.describe FlowClient::Client do
 
       expect(res.type).to eq("Int")
       expect(res.value).to eq("11")
+    end
+  end
+
+  context "transactions" do
+    before() do
+      @private_key, @public_key = FlowClient::Crypto.generate_key_pair()
+      @arguments = [
+        FlowClient::CadenceType.Array(
+          [@public_key].to_a.map { |key| FlowClient::CadenceType.String(key) }
+        ),
+        FlowClient::CadenceType.Dictionary(
+          []
+        ),
+      ]
+      @payer_account = client.get_account(service_account_address)
+      @script = File.read(File.join("lib", "cadence", "templates", "create-account.cdc"))
+    end
+
+    let(:tx_response) do
+      signer = FlowClient::LocalSigner.new(@private_key)
+      transaction = FlowClient::Transaction.new
+      transaction.script = @script
+      transaction.reference_block_id = client.get_latest_block.id
+      transaction.proposer_address = @payer_account.address
+      transaction.proposer_key_index = 0
+      transaction.arguments = @arguments
+      transaction.proposer_key_sequence_number = client.get_account(@payer_account.address).keys.first.sequence_number
+      transaction.payer_address = @payer_account.address
+      transaction.authorizer_addresses = [@payer_account.address]
+      transaction.add_envelope_signature(@payer_account.address, 0, signer)
+      client.send_transaction(transaction)
+    end
+
+    describe "get_transaction" do
+      before() do
+        @tx = client.get_transaction(tx_response.id)
+      end
+        
+      it { expect(@tx).to be_an_instance_of(FlowClient::Transaction) }
+      it { expect(@tx.payer_address).to eq(service_account_address) }
+      it { expect(@tx.authorizer_addresses).to eq([service_account_address]) }
+      it { expect(@tx.arguments).to eq(@arguments.map { |arg| FlowClient::Utils.openstruct_to_json(arg) }) }
+      it { expect(@tx.script).to eq(@script) }
+      it { expect(@tx.proposal_key).to be_an_instance_of(FlowClient::ProposalKey) }
+      it { expect(@tx.reference_block_id).to be_an_instance_of(String) }
+      it { expect(@tx.envelope_signatures.first).to be_an_instance_of(FlowClient::Signature) }
+    end
+
+    describe "get_transaction_result" do
+      before() do
+        @tx = client.get_transaction_result(tx_response.id)
+      end
+
+      it { expect(@tx).to be_an_instance_of(FlowClient::TransactionResult) }
+    end
+
+    describe "send_transaction" do
+      it { expect(tx_response).to be_an_instance_of(FlowClient::TransactionResponse) }
+      it { expect(tx_response.id).to be_an_instance_of(String) }
     end
   end
 end
