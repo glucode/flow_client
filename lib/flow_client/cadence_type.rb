@@ -86,14 +86,6 @@ module FlowClient
       OpenStruct.new(type: "UInt64", value: value.to_s)
     end
 
-    def self.Int64(value)
-      OpenStruct.new(type: "Int64", value: value.to_s)
-    end
-
-    def self.UInt64(value)
-      OpenStruct.new(type: "UInt64", value: value.to_s)
-    end
-
     def self.Int128(value)
       OpenStruct.new(type: "Int128", value: value.to_s)
     end
