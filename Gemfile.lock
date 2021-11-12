@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    flow_client (0.2.2)
+    flow_client (0.2.2-x86_64-darwin-20)
       grpc
       grpc-tools
       json
@@ -17,13 +17,17 @@ GEM
     docile (1.4.0)
     ffi (1.15.4)
     formatador (0.3.0)
+    google-protobuf (3.19.1)
     google-protobuf (3.19.1-x86_64-darwin)
     googleapis-common-protos-types (1.3.0)
       google-protobuf (~> 3.14)
-    grpc (1.41.0-universal-darwin)
+    grpc (1.41.1)
       google-protobuf (~> 3.17)
       googleapis-common-protos-types (~> 1.0)
-    grpc-tools (1.41.0)
+    grpc (1.41.1-universal-darwin)
+      google-protobuf (~> 3.17)
+      googleapis-common-protos-types (~> 1.0)
+    grpc-tools (1.41.1)
     guard (2.18.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -101,7 +105,9 @@ GEM
     unicode-display_width (2.1.0)
 
 PLATFORMS
+  ruby
   x86_64-darwin-20
+  x86_86-linux
 
 DEPENDENCIES
   flow_client!
