@@ -19,4 +19,5 @@ module FlowClient
   require "flow_client/event"
   require "flow_client/cadence_type"
   require "flow_client/signature"
+  require "flow_client/http_client"
 end

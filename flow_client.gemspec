@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "json", "~> 2.6.1"
   spec.add_runtime_dependency "openssl", "~> 2.2.1"
   spec.add_runtime_dependency "rlp", "~> 0.7.3"
+  spec.add_runtime_dependency "httparty", "~> 0.20.0"
 
   spec.add_development_dependency "simplecov"
 
