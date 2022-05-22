@@ -25,7 +25,14 @@ module FlowClient
       @address = address
       @balance = balance
       @contracts = contracts
+      # TODO: What is this? 
       @contracts = {}
+    end
+
+    def self.parse_json_type(json)
+      Account.new(
+        address: json["address"]
+      )
     end
   end
 end

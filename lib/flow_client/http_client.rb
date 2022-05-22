@@ -7,7 +7,9 @@ module FlowClient
     base_uri 'https://rest-testnet.onflow.org/v1/'
 
     def get_account(address)
-      self.class.get("/accounts/#{address}")
+      response = self.class.get("/accounts/#{address}")
+      puts response.parsed_response["address"].inspect
+      FlowClient::Account.parse_json_type(response.parsed_response)
     end
 
     def get_block(block_id)

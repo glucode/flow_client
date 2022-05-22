@@ -12,3 +12,5 @@ gem "rubocop", "~> 1.22"
 gem 'simplecov'
 
 gem "httparty", "~> 0.20.0"
+
+gem "webmock", "~> 3.14"

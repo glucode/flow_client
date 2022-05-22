@@ -9,7 +9,7 @@ end
 # SimpleCov.coverage_dir 'public/coverage'
 
 require "flow_client"
-
+require 'webmock/rspec'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
