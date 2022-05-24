@@ -3,6 +3,8 @@
 module FlowClient
   # A collection of utilities.
   module Utils
+    FCL_ACCOUNT_PROOF_DOMAIN_TAG = "FCL-ACCOUNT-PROOF-V0.0"
+
     # Left pads a byte array with 0 to length
     def self.left_pad_bytes(byte_array, length)
       required_pad_count = length - byte_array.count
@@ -36,8 +38,9 @@ module FlowClient
       new_string
     end
 
+    # Strip 0x prefix from a Flow account address
     def self.strip_address_prefix(address)
-      address[0..1]
+      address.slice! '0x'
     end
 
     def self.parse_protobuf_timestamp(timestamp)
@@ -47,6 +50,23 @@ module FlowClient
 
     def self.openstruct_to_json(struct)
       struct.deep_to_h.to_json
+    end
+
+    # Generate an encoded account proof message
+    def self.encoded_account_proof(address, nonce, app_identifier, include_domain_tag = true)
+      address = Utils.left_pad_bytes([address].pack("H*").bytes, 8).pack("C*")
+      payload = [app_identifier, address, [nonce].pack("H*")]
+
+      if include_domain_tag
+        padded_tag = Utils.right_pad_bytes(FCL_ACCOUNT_PROOF_DOMAIN_TAG.bytes, 32).pack("c*")
+        (padded_tag + RLP.encode(payload)).bytes.pack("C*").unpack1("H*")
+      else
+        RLP.encode(payload).bytes.pack('C*')
+      end
+    end
+
+    def self.verify_account_proof_signature
+
     end
   end
 end
