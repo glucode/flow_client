@@ -29,10 +29,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_runtime_dependency "grpc", "~> 1.42.0.pre1"
-  spec.add_runtime_dependency "grpc-tools", "~> 1.41.1"
-  spec.add_runtime_dependency "json", "~> 2.6.1"
-  spec.add_runtime_dependency "openssl", "~> 2.2.1"
+  spec.add_runtime_dependency "grpc", "~> 1.48.0"
+  spec.add_runtime_dependency "grpc-tools", "~> 1.48.0"
+  spec.add_runtime_dependency "json", "~> 2.6.2"
+  spec.add_runtime_dependency "openssl", "~> 3.0.0"
   spec.add_runtime_dependency "rlp", "~> 0.7.3"
 
   spec.add_development_dependency "simplecov"
