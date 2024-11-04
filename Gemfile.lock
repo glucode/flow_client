@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     flow_client (0.2.3)
-      grpc (>= 1.48, < 1.57)
+      grpc (>= 1.48, < 1.68)
       grpc-tools (~> 1.48.0)
       json (~> 2.6.2)
       openssl (~> 3.0.0)
@@ -17,10 +17,10 @@ GEM
     docile (1.4.0)
     ffi (1.15.5)
     formatador (1.1.0)
-    google-protobuf (3.23.3)
-    googleapis-common-protos-types (1.6.0)
-      google-protobuf (~> 3.14)
-    grpc (1.56.0)
+    google-protobuf (3.25.5)
+    googleapis-common-protos-types (1.16.0)
+      google-protobuf (>= 3.18, < 5.a)
+    grpc (1.56.2)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.48.0)
