@@ -17,7 +17,7 @@ GEM
     docile (1.4.0)
     ffi (1.15.5)
     formatador (1.1.0)
-    google-protobuf (3.23.3)
+    google-protobuf (3.25.5)
     googleapis-common-protos-types (1.6.0)
       google-protobuf (~> 3.14)
     grpc (1.56.0)
